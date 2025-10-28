@@ -184,24 +184,24 @@
         // Each product has a list of 'options' (SKUs) with unique skuIds for tracking in the cart.
         const allProducts = [
             { id: 1, name: "Premium Ragi (Finger Millet)", img: "https://images.unsplash.com/photo-1627953289947-a42e7535492d?q=80&w=150&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D", fallback: "https://placehold.co/150x150/38a169/ffffff?text=Ragi", options: [
-                { skuId: '1-a', unit: '500 g', price: 25.00 },
-                { skuId: '1-b', unit: '1 kg', price: 45.00 },
-                { skuId: '1-c', unit: '5 kg', price: 210.00 }
+                { skuId: '1-a', unit: '500 g', price: 35.00 },
+                { skuId: '1-b', unit: '1 kg', price: 70.00 },
+                { skuId: '1-c', unit: '5 kg', price: 340.00 }
             ]},
             { id: 2, name: "Jowar (Sorghum)", img: "https://images.unsplash.com/photo-1627953291264-9f4a5118f7a6?q=80&w=150&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D", fallback: "https://placehold.co/150x150/dd6b20/ffffff?text=Jowar", options: [
-                { skuId: '2-a', unit: '500 g', price: 20.00 },
-                { skuId: '2-b', unit: '1 kg', price: 40.00 },
-                { skuId: '2-c', unit: '5 kg', price: 190.00 }
+                { skuId: '2-a', unit: '500 g', price: 25.00 },
+                { skuId: '2-b', unit: '1 kg', price: 50.00 },
+                { skuId: '2-c', unit: '5 kg', price: 250.00 }
             ]},
             { id: 3, name: "Dry Coconut (Kobbari)", img: "https://images.unsplash.com/photo-1614949504446-271708849b28?q=80&w=150&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D", fallback: "https://placehold.co/150x150/d69e2e/ffffff?text=Kobbari", options: [
-                { skuId: '3-a', unit: '500 g', price: 80.00 },
-                { skuId: '3-b', unit: '1 kg', price: 150.00 },
-                { skuId: '3-c', unit: '5 kg', price: 720.00 }
+                { skuId: '3-a', unit: '500 g', price: 90.00 },
+                { skuId: '3-b', unit: '1 kg', price: 180.00 },
+                { skuId: '3-c', unit: '5 kg', price: 900.00 }
             ]},
             { id: 4, name: "Groundnut (Peanut) Seeds", img: "https://images.unsplash.com/photo-1549419163-9af5691e84a2?q=80&w=150&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D", fallback: "https://placehold.co/150x150/319795/ffffff?text=Nut+Seed", options: [
-                { skuId: '4-a', unit: '500 g', price: 60.00 },
-                { skuId: '4-b', unit: '1 kg', price: 110.00 },
-                { skuId: '4-c', unit: '5 kg', price: 500.00 }
+                { skuId: '4-a', unit: '500 g', price: 80.00 },
+                { skuId: '4-b', unit: '1 kg', price: 150.00 },
+                { skuId: '4-c', unit: '5 kg', price: 750.00 }
             ]},
             { id: 5, name: "Toor Dal (Pigeon Pea Split)", img: "https://images.unsplash.com/photo-1627953291242-706f97970d24?q=80&w=150&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D", fallback: "https://placehold.co/150x150/a0aec0/ffffff?text=Toor+Dal", options: [
                 { skuId: '5-a', unit: '500 g', price: 80.00 },
@@ -215,19 +215,19 @@
             ]},
             { id: 7, name: "Local Green Moong Dal", img: "https://images.unsplash.com/photo-1616016668740-4202d603a152?q=80&w=150&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D", fallback: "https://placehold.co/150x150/ecc94b/ffffff?text=Moong", options: [
                 { skuId: '7-a', unit: '500 g', price: 40.00 },
-                { skuId: '7-b', unit: '1 kg', price: 75.00 },
-                { skuId: '7-c', unit: '5 kg', price: 350.00 }
+                { skuId: '7-b', unit: '1 kg', price: 80.00 },
+                { skuId: '7-c', unit: '5 kg', price: 400.00 }
             ]},
             { id: 8, name: "Cold Pressed Groundnut Oil", img: "https://images.unsplash.com/photo-1607592237834-40660a9270a6?q=80&w=150&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D", fallback: "https://placehold.co/150x150/065f46/ffffff?text=G.Nut+Oil", options: [
-                { skuId: '8-a', unit: '1 Litre', price: 220.00 }
+                { skuId: '8-a', unit: '1 Litre', price: 380.00 }
             ]},
             { id: 9, name: "Cold Pressed Coconut Oil", img: "https://images.unsplash.com/photo-1604104597152-ee702951f33f?q=80&w=150&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D", fallback: "https://placehold.co/150x150/065f46/ffffff?text=Coco+Oil", options: [
-                { skuId: '9-a', unit: '1 Litre', price: 250.00 }
+                { skuId: '9-a', unit: '1 Litre', price: 350.00 }
             ]},
             { id: 10, name: "Castor Seeds", img: "https://images.unsplash.com/photo-1627953290374-e88924b123a6?q=80&w=150&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D", fallback: "https://placehold.co/150x150/9f7aea/ffffff?text=Castor+Seed", options: [
                 { skuId: '10-a', unit: '500 g', price: 35.00 },
-                { skuId: '10-b', unit: '1 kg', price: 60.00 },
-                { skuId: '10-c', unit: '5 kg', price: 280.00 }
+                { skuId: '10-b', unit: '1 kg', price: 70.00 },
+                { skuId: '10-c', unit: '5 kg', price: 350.00 }
             ]},
             { id: 11, name: "Cold Pressed Castor Oil", img: "https://images.unsplash.com/photo-1596707328608-251c6c559814?q=80&w=150&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D", fallback: "https://placehold.co/150x150/065f46/ffffff?text=Castor+Oil", options: [
                 { skuId: '11-a', unit: '1 Litre', price: 300.00 }
@@ -468,4 +468,5 @@
 
     </script>
 </body>
+
 </html>
