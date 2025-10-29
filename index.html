@@ -177,6 +177,7 @@
         setLogLevel('Debug');
         const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
         const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : {};
+        const initialAuthToken = typeof __initial_auth_token !== 'undefined' ? __initial_auth_token : null;
 
         let app, db, auth, userId = null;
         let isAuthReady = false;
@@ -227,13 +228,13 @@
             document.getElementById('cartItems').textContent = `Items: ${totalItems}`;
             document.getElementById('cartTotal').textContent = `Total: ₹${totalAmount.toFixed(2)}`;
             
-            // Proceed button is enabled if there are items and the user is NOT anonymous
+            // Proceed button is enabled if there are items AND the user is NOT anonymous
             const proceedButton = document.getElementById('proceedToOrderButton');
-            const canProceed = totalItems > 0 && userId && !auth.currentUser?.isAnonymous;
+            const canProceed = totalItems > 0 && userId && !auth?.currentUser?.isAnonymous;
             proceedButton.disabled = !canProceed;
 
             // Save cart to DB
-            if (isAuthReady && userId && !auth.currentUser?.isAnonymous) {
+            if (isAuthReady && userId && !auth?.currentUser?.isAnonymous) {
                 saveCartToDB(cart).catch(err => console.error("Failed to save cart:", err));
             }
         }
@@ -264,7 +265,8 @@
                 // If products don't exist, save the default set
                 console.log("No products found. Initializing with default data.");
                 const data = { products: defaultProducts, lastUpdated: new Date() };
-                await setDoc(productsDocRef, data);
+                // Using merge: true just in case the document exists partially
+                await setDoc(productsDocRef, data, { merge: true }); 
                 return defaultProducts;
             } else {
                 console.log("Products loaded from database.");
@@ -298,7 +300,8 @@
             products = currentProducts;
             const grid = document.getElementById('productGrid');
             grid.innerHTML = ''; // Clear existing content
-            document.getElementById('loadingIndicator')?.classList.add('hidden');
+            const loadingIndicator = document.getElementById('loadingIndicator');
+            if(loadingIndicator) loadingIndicator.classList.add('hidden');
 
             if (products.length === 0) {
                 grid.innerHTML = '<p class="text-xl text-gray-500 col-span-full text-center py-12">No products available. Please sign in to load the default catalog.</p>';
@@ -311,34 +314,34 @@
 
                 // Product Title Header
                 const headerBg = product.titleColor.includes('bg-') ? product.titleColor.split(' ').find(c => c.startsWith('bg-')) : 'bg-gray-800';
+                
+                // Ensure the price is displayed only if sizes are defined
+                const sizesHtml = product.sizes.map((sizeOption, index) => {
+                    const cartId = `${product.id}-${index}`;
+                    const currentQty = cart[cartId] ? cart[cartId].quantity : 0;
+                    return `
+                        <div class="flex justify-between items-center py-2 border-t border-gray-100">
+                            <div class="flex flex-col">
+                                <span class="text-lg font-bold text-green-600">₹${sizeOption.price.toFixed(2)}</span>
+                                <span class="text-sm text-gray-500">${sizeOption.size}</span>
+                            </div>
+                            <div class="flex items-center space-x-1">
+                                <button data-cart-id="${cartId}" data-action="decrement" class="qty-button bg-orange-100 text-orange-600 rounded-full hover:bg-orange-200">-</button>
+                                <span id="qty-${cartId}" class="w-8 text-center font-bold text-gray-700">${currentQty}</span>
+                                <button data-cart-id="${cartId}" data-action="increment" class="qty-button bg-green-100 text-green-600 rounded-full hover:bg-green-200">+</button>
+                            </div>
+                        </div>
+                    `;
+                }).join('');
+
                 card.innerHTML = `
                     <div class="rounded-lg mb-4 text-center p-6 ${headerBg}">
                         <h3 class="text-4xl font-extrabold text-white">${product.name.split('(')[0].trim()}</h3>
                         <p class="text-white font-medium">${product.name.includes('(') ? product.name.split('(')[1].replace(')', '').trim() : ''}</p>
                     </div>
                     <p class="text-lg font-semibold text-gray-800 mb-4">${product.name}</p>
+                    ${sizesHtml}
                 `;
-
-                product.sizes.forEach((sizeOption, index) => {
-                    // Unique ID for this size option in the cart: productID-sizeIndex
-                    const cartId = `${product.id}-${index}`;
-                    const currentQty = cart[cartId] ? cart[cartId].quantity : 0;
-
-                    const sizeDiv = document.createElement('div');
-                    sizeDiv.className = 'flex justify-between items-center py-2 border-t border-gray-100';
-                    sizeDiv.innerHTML = `
-                        <div class="flex flex-col">
-                            <span class="text-lg font-bold text-green-600">₹${sizeOption.price.toFixed(2)}</span>
-                            <span class="text-sm text-gray-500">${sizeOption.size}</span>
-                        </div>
-                        <div class="flex items-center space-x-1">
-                            <button data-cart-id="${cartId}" data-action="decrement" class="qty-button bg-orange-100 text-orange-600 rounded-full hover:bg-orange-200">-</button>
-                            <span id="qty-${cartId}" class="w-8 text-center font-bold text-gray-700">${currentQty}</span>
-                            <button data-cart-id="${cartId}" data-action="increment" class="qty-button bg-green-100 text-green-600 rounded-full hover:bg-green-200">+</button>
-                        </div>
-                    `;
-                    card.appendChild(sizeDiv);
-                });
 
                 grid.appendChild(card);
             });
@@ -348,7 +351,7 @@
 
         function handleCartUpdate(event) {
             const button = event.target.closest('button');
-            if (!button) return;
+            if (!button || !products.length) return; // Exit if not a button or products not loaded
 
             const cartId = button.dataset.cartId;
             const action = button.dataset.action;
@@ -397,21 +400,24 @@
             calculateCart();
         }
 
+        // Custom Alert/Message Box Function (Replaces alert())
+        function showMessageModal(title, message) {
+            console.log(`[Message: ${title}] ${message}`);
+            // Since alert() is forbidden, we use a simple console log
+            // and an aggressive, though temporary, window alert for critical messages.
+            // In a real app, this would be replaced with a beautiful custom modal.
+            window.alert(`${title}\n\n${message}`); 
+        }
+
         function setupListeners() {
             // Product Grid click listener for cart updates
-            document.getElementById('productGrid').addEventListener('click', handleCartUpdate);
+            const productGrid = document.getElementById('productGrid');
+            if(productGrid) productGrid.addEventListener('click', handleCartUpdate);
 
             // Auth Modal Listeners
-            document.getElementById('authToggleButton').addEventListener('click', () => {
-                if (!userId || auth.currentUser.isAnonymous) {
-                    // Only show modal if user is guest/anonymous
-                    document.getElementById('authMessage').textContent = '';
-                    document.getElementById('authModal').style.display = 'block';
-                }
-                // Sign out logic is handled dynamically in onAuthStateChanged
-            });
-
-            document.getElementById('closeAuthModal').addEventListener('click', () => {
+            // Listener for authToggleButton is added dynamically in onAuthStateChanged
+            const closeAuthModal = document.getElementById('closeAuthModal');
+            if(closeAuthModal) closeAuthModal.addEventListener('click', () => {
                 document.getElementById('authModal').style.display = 'none';
             });
 
@@ -421,7 +427,7 @@
             const authSubmitButton = document.getElementById('authSubmitButton');
             const toggleAuthModeButton = document.getElementById('toggleAuthMode');
 
-            toggleAuthModeButton.addEventListener('click', (e) => {
+            if(toggleAuthModeButton) toggleAuthModeButton.addEventListener('click', (e) => {
                 e.preventDefault();
                 isSignInMode = !isSignInMode;
                 if (isSignInMode) {
@@ -434,7 +440,7 @@
                 document.getElementById('authMessage').textContent = '';
             });
 
-            authForm.addEventListener('submit', async (e) => {
+            if(authForm) authForm.addEventListener('submit', async (e) => {
                 e.preventDefault();
                 const email = document.getElementById('authEmail').value;
                 const password = document.getElementById('authPassword').value;
@@ -448,7 +454,6 @@
                         await createUserWithEmailAndPassword(auth, email, password);
                     }
                     document.getElementById('authModal').style.display = 'none';
-                    // onAuthStateChanged will handle UI update
                 } catch (error) {
                     let errorMessage = 'An unknown error occurred.';
                     if (error.code) {
@@ -460,9 +465,10 @@
             });
 
             // Order Modal Listeners
-            document.getElementById('proceedToOrderButton').addEventListener('click', () => {
-                if (!userId || auth.currentUser?.isAnonymous) {
-                     alertModal("Sign In Required", 'Please sign in or create an account before placing an order.');
+            const proceedToOrderButton = document.getElementById('proceedToOrderButton');
+            if(proceedToOrderButton) proceedToOrderButton.addEventListener('click', () => {
+                if (!userId || auth?.currentUser?.isAnonymous) {
+                     showMessageModal("Sign In Required", 'Please sign in or create an account before placing an order.');
                      return;
                 }
                 // Reset to step 1
@@ -472,18 +478,18 @@
                 document.getElementById('orderModal').style.display = 'block';
             });
 
-            document.getElementById('cancelOrder').addEventListener('click', () => {
+            document.getElementById('cancelOrder')?.addEventListener('click', () => {
                 document.getElementById('orderModal').style.display = 'none';
             });
 
-            document.getElementById('backToDelivery').addEventListener('click', () => {
+            document.getElementById('backToDelivery')?.addEventListener('click', () => {
                 document.getElementById('orderModalTitle').textContent = '1. Delivery Details';
                 document.getElementById('deliveryForm').classList.remove('hidden');
                 document.getElementById('paymentDetails').classList.add('hidden');
             });
 
             // Handle Delivery Form Submission (Step 1 -> 2)
-            document.getElementById('deliveryForm').addEventListener('submit', (e) => {
+            document.getElementById('deliveryForm')?.addEventListener('submit', (e) => {
                 e.preventDefault();
 
                 // Build order summary for step 2
@@ -510,7 +516,7 @@
             });
 
             // Handle Place Order Button (Step 2 -> Final)
-            document.getElementById('placeOrderButton').addEventListener('click', async () => {
+            document.getElementById('placeOrderButton')?.addEventListener('click', async () => {
                 const orderData = {
                     customerName: document.getElementById('deliveryName').value,
                     mobile: document.getElementById('deliveryMobile').value,
@@ -533,12 +539,12 @@
                     renderProducts(products); // Re-render to show 0 quantity
 
                     // Show success message
-                    alertModal("Success", `Order placed successfully! Total: ₹${orderData.total.toFixed(2)}. We will contact you shortly on WhatsApp.`);
+                    showMessageModal("Success", `Order placed successfully! Total: ₹${orderData.total.toFixed(2)}. We will contact you shortly on WhatsApp.`);
                     document.getElementById('orderModal').style.display = 'none';
 
                 } catch (error) {
                     console.error("Error placing order:", error);
-                    alertModal("Error", "There was an error placing your order. Please try again.");
+                    showMessageModal("Error", "There was an error placing your order. Please try again.");
                 } finally {
                     document.getElementById('placeOrderButton').textContent = 'Place Final Order';
                     document.getElementById('placeOrderButton').disabled = false;
@@ -547,23 +553,22 @@
         }
 
 
-        // Custom Alert/Message Box Function (Replaces alert())
-        function alertModal(title, message) {
-            // A simple modal/dialog can be implemented here, but for this environment,
-            // we will use the native window.alert().
-            window.alert(`${title}\n\n${message}`);
-        }
-
         // --- Firebase Initialization and Auth Logic (FIXED) ---
 
         async function initFirebase() {
+            const loadingIndicator = document.getElementById('loadingIndicator');
+
             try {
+                // Robust check for Firebase config
+                if (!firebaseConfig || Object.keys(firebaseConfig).length === 0) {
+                    throw new Error("Firebase configuration is missing or empty.");
+                }
+
                 app = initializeApp(firebaseConfig);
                 db = getFirestore(app);
                 auth = getAuth(app);
 
                 // Initial authentication attempt (runs only once on load)
-                const initialAuthToken = typeof __initial_auth_token !== 'undefined' ? __initial_auth_token : null;
                 if (initialAuthToken && initialAuthToken.length > 0) {
                     await signInWithCustomToken(auth, initialAuthToken);
                 } else {
@@ -574,19 +579,15 @@
                 setupListeners();
                 
                 // Auth State Listener: This is the core logic that runs every time the user signs in or out.
-                // FIX 1: This is now safely inside initFirebase after 'auth' is defined.
                 onAuthStateChanged(auth, async (user) => {
                     isAuthReady = true;
                     const statusEl = document.getElementById('authStatus');
                     let toggleBtn = document.getElementById('authToggleButton');
 
-                    // ----------------------------------------------------
-                    // FIX 2: Handle button cloning/replacement for safe listener attachment
-                    // Always clone the button to remove old listeners before setting the new one.
+                    // FIX: Cloning the button to safely remove old listeners.
                     const newToggleBtn = toggleBtn.cloneNode(true);
                     toggleBtn.parentNode.replaceChild(newToggleBtn, toggleBtn);
                     toggleBtn = newToggleBtn; 
-                    // ----------------------------------------------------
 
                     if (user) {
                         userId = user.uid;
@@ -597,6 +598,9 @@
                         // 1. Update UI to Signed In/Guest
                         statusEl.innerHTML = isAnon ? 'Status: Guest' : `User ID: <span class="font-mono text-xs">${userId}</span>`;
                         toggleBtn.textContent = 'Sign Out';
+                        toggleBtn.classList.remove('bg-[#38A169]');
+                        toggleBtn.classList.add('bg-red-500', 'hover:bg-red-600');
+
 
                         // Attach Sign Out listener
                         toggleBtn.addEventListener('click', async () => {
@@ -608,6 +612,7 @@
                         });
 
                         // 2. Load/Initialize Products
+                        if (loadingIndicator) loadingIndicator.textContent = 'Fetching products...';
                         try {
                             const fetchedProducts = await fetchWithRetry(() => initializeProducts(db, userId));
                             products = fetchedProducts;
@@ -615,38 +620,42 @@
                             console.error("Failed to fetch/initialize products:", error);
                         }
 
-                        // 3. Load Cart (if logged in)
-                        try {
-                            const cartDocRef = getCartDocRef(db, userId);
-                            // Set up the real-time listener for the cart
-                            onSnapshot(cartDocRef, (docSnap) => {
-                                const newCart = docSnap.data()?.cart || {};
-                                // Only update if the content has actually changed (or first load)
-                                if (JSON.stringify(cart) !== JSON.stringify(newCart)) {
-                                    cart = newCart;
-                                    calculateCart();
-                                    renderProducts(products);
-                                }
-                            }, (error) => {
-                                console.error("Error setting up cart listener:", error);
-                            });
-                        } catch (error) {
-                            console.error("Failed to set up cart listener (initial):", error);
+                        // 3. Load Cart (if authenticated)
+                        if (!isAnon) {
+                            try {
+                                const cartDocRef = getCartDocRef(db, userId);
+                                // Set up the real-time listener for the cart
+                                onSnapshot(cartDocRef, (docSnap) => {
+                                    const newCart = docSnap.data()?.cart || {};
+                                    // Update only if content changed
+                                    if (JSON.stringify(cart) !== JSON.stringify(newCart)) {
+                                        cart = newCart;
+                                        calculateCart();
+                                        renderProducts(products);
+                                    }
+                                }, (error) => {
+                                    console.error("Error setting up cart listener:", error);
+                                });
+                            } catch (error) {
+                                console.error("Failed to set up cart listener (initial):", error);
+                            }
                         }
 
-                        // Initial render of products
+                        // Initial render and cart update
                         renderProducts(products);
-                        calculateCart(); // Update cart status
+                        calculateCart(); 
 
                     } else {
                         // Signed Out State
                         userId = null;
                         cart = {};
-                        products = [];
+                        products = defaultProducts; // Show default products even if signed out, but cart ops are limited.
 
                         // 1. Update UI to Signed Out/Guest
                         statusEl.textContent = 'Status: Guest';
                         toggleBtn.textContent = 'Sign In';
+                        toggleBtn.classList.remove('bg-red-500', 'hover:bg-red-600');
+                        toggleBtn.classList.add('bg-[#38A169]');
 
                         // Attach Sign In listener (to open modal)
                         toggleBtn.addEventListener('click', () => {
@@ -654,15 +663,18 @@
                             document.getElementById('authModal').style.display = 'block';
                         });
 
-                        // 2. Clear Cart and Products UI
+                        // 2. Clear Cart and Products UI (show defaults with 0 qty)
                         calculateCart();
-                        renderProducts(products); // Render empty list
+                        renderProducts(products);
                     }
                 });
 
             } catch (error) {
-                console.error("Firebase initialization failed:", error);
-                document.getElementById('loadingIndicator').textContent = 'Error loading application. Check console for details.';
+                console.error("CRITICAL: Firebase initialization failed. Check console for configuration errors.", error);
+                if (loadingIndicator) {
+                    loadingIndicator.innerHTML = '<span class="text-red-500 font-bold">ERROR: Application failed to load. Please check console for configuration details.</span>';
+                }
+                isAuthReady = false;
             }
         }
 
