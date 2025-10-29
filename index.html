@@ -5,19 +5,23 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Root Direct | Seasonal Staples</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&family=Noto+Sans:wght@400;600;700&display=swap" rel="stylesheet">
     <style>
-        body { font-family: 'Inter', sans-serif; background-color: #f7fafc; }
+        body {
+            font-family: 'Noto Sans', 'Inter', sans-serif;
+            background-color: #f7fafc; /* Fallback background */
+        }
         .product-card {
             box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.1);
             transition: transform 0.2s;
+            background-color: white; /* Ensure card background is white */
         }
         .product-card:hover {
             transform: translateY(-2px);
             box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -4px rgba(0, 0, 0, 0.1);
         }
         .modal {
-            display: none;
+            display: none; /* Hidden by default */
             position: fixed;
             z-index: 1000;
             left: 0;
@@ -25,17 +29,20 @@
             width: 100%;
             height: 100%;
             overflow: auto;
-            background-color: rgba(0,0,0,0.4);
+            background-color: rgba(0,0,0,0.5); /* Semi-transparent black */
             backdrop-filter: blur(5px);
+            align-items: center; /* Center vertically */
+            justify-content: center; /* Center horizontally */
         }
         .modal-content {
             background-color: #ffffff;
-            margin: 5% auto;
             padding: 30px;
             border-radius: 12px;
             width: 90%;
             max-width: 500px;
             animation: fadeIn 0.3s;
+            max-height: 90vh; /* Limit modal height */
+            overflow-y: auto; /* Allow scrolling if content overflows */
         }
         @keyframes fadeIn {
             from { opacity: 0; transform: scale(0.95); }
@@ -52,7 +59,7 @@
         .qty-button:hover {
             opacity: 0.9;
         }
-        /* Responsive Grid for Products */
+        /* Product Grid */
         .product-grid {
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
@@ -63,389 +70,859 @@
                 grid-template-columns: 1fr;
             }
         }
+
+        /* Image Carousel */
+        .image-container {
+            position: relative;
+            overflow: hidden;
+            border-top-left-radius: 0.75rem;
+            border-top-right-radius: 0.75rem;
+            height: 180px; /* Increased height for better images */
+            background-color: #e2e8f0; /* Placeholder color */
+        }
+        .product-image {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: opacity 0.3s ease-in-out;
+            position: absolute;
+            top: 0;
+            left: 0;
+            opacity: 0;
+        }
+        .product-image.active {
+            opacity: 1;
+        }
+        .carousel-btn {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            background-color: rgba(0, 0, 0, 0.5);
+            color: white;
+            padding: 8px;
+            border-radius: 50%;
+            cursor: pointer;
+            z-index: 10;
+        }
+        .carousel-btn.prev { left: 8px; }
+        .carousel-btn.next { right: 8px; }
+
+        /* Tracking Timeline */
+        .timeline { position: relative; padding-left: 2rem; }
+        .timeline::before { content: ''; position: absolute; left: 9px; top: 0; bottom: 0; width: 2px; background: #a7f3d0; }
+        .timeline-item { position: relative; margin-bottom: 2rem; padding-left: 1.5rem; }
+        .timeline-bullet { content: ''; position: absolute; left: 0; top: 0.25rem; width: 20px; height: 20px; border-radius: 50%; background: #d1d5db; border: 4px solid #f0fdf4; transition: background 0.5s ease-in-out; }
+        .timeline-item.active .timeline-bullet { background: #10b981; box-shadow: 0 0 0 4px #a7f3d0; }
+
+        /* Backgrounds */
+        #page-content {
+            min-height: calc(100vh - 180px);
+            background-size: cover;
+            background-position: center center; /* Ensure center positioning */
+            background-repeat: no-repeat;
+            transition: background-image 0.5s ease-in-out;
+            position: relative;
+            padding-top: 1.5rem; /* Padding from top of background */
+        }
+        /* Overlay for Readability */
+        #page-content::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background-color: rgba(255, 255, 255, 0.80); /* Slightly increased opacity */
+            backdrop-filter: blur(3px); /* Slightly increased blur */
+            z-index: 1;
+        }
+        #page-content > div.view-content {
+            position: relative;
+            z-index: 2;
+            padding: 1rem;
+        }
+        /* Specific Background Image Classes - REPLACE PLACEHOLDERS */
+        .bg-products { background-image: url('https://i.imgur.com/your-image-1-url.jpg'); }
+        .bg-tracking { background-image: url('https://i.imgur.com/your-image-2-url.jpg'); }
+        .bg-about { background-image: url('https://i.imgur.com/your-image-3-url.jpg'); }
+        .bg-contact { background-image: url('https://i.imgur.com/your-image-4-url.jpg'); }
+        /* You MUST replace the placeholder URLs above with the actual URLs for your images */
+
+        /* Toast Notifications */
+        #toast-container { position: fixed; top: 20px; right: 20px; z-index: 1050; display: flex; flex-direction: column; gap: 10px; }
+        .toast { padding: 10px 20px; color: white; border-radius: 8px; opacity: 0; transition: opacity 0.3s, transform 0.3s; transform: translateX(100%); width: fit-content; max-width: 300px; }
+        .toast.show { opacity: 1; transform: translateX(0); }
+        .toast.success { background-color: #28a745; }
+        .toast.error { background-color: #dc3545; }
     </style>
 </head>
 <body class="min-h-screen flex flex-col">
 
     <!-- Navbar -->
-    <header class="bg-white shadow-md">
+    <header class="sticky top-0 bg-white shadow-md z-30">
         <div class="max-w-7xl mx-auto p-4 flex justify-between items-center">
-            <h1 class="text-2xl font-extrabold text-[#38A169]">Root Direct</h1>
+            <h1 class="text-2xl font-extrabold text-[#38A169]" data-translate="appTitle">Root Direct</h1>
             <div class="flex items-center space-x-4">
                 <span id="authStatus" class="text-sm text-gray-600">Status: Loading...</span>
-                <!-- Button starts as Sign In, changes ID and listener on auth state change -->
-                <button id="authToggleButton" class="px-4 py-2 bg-[#38A169] text-white font-semibold rounded-lg shadow-md hover:bg-green-700 transition duration-150">Sign In</button>
+                <button id="authToggleButton" class="px-4 py-2 bg-[#38A169] text-white font-semibold rounded-lg shadow-md hover:bg-green-700 transition duration-150" data-translate-signin="signIn" data-translate-signout="signOut">Sign In</button>
+                 <button onclick="toggleLanguage()" id="lang-toggle" class="bg-orange-600 hover:bg-orange-700 text-white text-sm font-bold py-2 px-4 rounded-lg transition duration-150 shadow-md">
+                    ಕನ್ನಡ (KN)
+                </button>
             </div>
         </div>
+        <!-- Navigation Tabs -->
+        <nav class="bg-gray-50 border-b border-gray-200">
+             <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex space-x-6 text-lg font-semibold overflow-x-auto">
+                <a href="#" onclick="showView('products-view')" id="nav-products" data-translate="navProducts" class="py-3 px-1 text-green-700 border-b-2 border-green-700 hover:text-orange-600 transition duration-150 whitespace-nowrap">Products</a>
+                <a href="#" onclick="showView('tracking-view')" id="nav-tracking" data-translate="navTrack" class="py-3 px-1 text-gray-500 border-b-2 border-transparent hover:text-orange-600 transition duration-150 whitespace-nowrap">Track Order</a>
+                <a href="#" onclick="showView('about-view')" id="nav-about" data-translate="navAbout" class="py-3 px-1 text-gray-500 border-b-2 border-transparent hover:text-orange-600 transition duration-150 whitespace-nowrap">About Us</a>
+                <a href="#" onclick="showView('contact-view')" id="nav-contact" data-translate="navContact" class="py-3 px-1 text-gray-500 border-b-2 border-transparent hover:text-orange-600 transition duration-150 whitespace-nowrap">Contact & Support</a>
+            </nav>
+        </nav>
     </header>
 
-    <!-- Main Content -->
-    <main class="flex-grow max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <h2 class="text-3xl font-bold text-gray-800 border-b-2 border-[#38A169] pb-2 mb-8">Seasonal Staples</h2>
-
-        <!-- Product Grid -->
-        <div id="productGrid" class="product-grid">
-            <!-- Products will be dynamically inserted here -->
-            <p id="loadingIndicator" class="text-gray-500 col-span-full text-center">Loading products...</p>
+    <!-- Main Content Area -->
+    <main id="page-content" class="flex-grow container mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <!-- View containers will be dynamically shown/hidden -->
+        <div id="products-view" class="view-content">
+            <h2 class="text-2xl font-bold text-gray-800 mb-6 border-l-4 border-orange-500 pl-3" data-translate="seasonalStaples">Seasonal Staples</h2>
+            <div id="productGrid" class="product-grid">
+                 <p id="loadingIndicator" class="text-gray-500 col-span-full text-center py-10 text-xl">Loading products...</p>
+                 <div id="errorIndicator" class="text-red-500 font-bold col-span-full text-center py-10 text-xl hidden">Error loading application. Check console for details.</div>
+            </div>
         </div>
+
+        <div id="tracking-view" class="view-content hidden">
+             <h2 class="text-3xl font-extrabold text-green-800 mb-6" data-translate="trackTitle">Track Your Order</h2>
+            <form id="tracking-form" onsubmit="event.preventDefault(); window.simulateTracking()">
+                 <div class="flex space-x-2 mb-6 shadow p-4 bg-white rounded-xl">
+                    <input type="text" id="order-id-input" data-placeholder-translate="enterOrderID" placeholder="Enter your Order ID (e.g., RD1234)" required class="flex-grow p-3 border border-gray-300 rounded-lg focus:ring-orange-500 focus:border-orange-500">
+                    <button type="submit" class="bg-orange-600 hover:bg-orange-700 text-white font-bold py-3 px-6 rounded-lg transition duration-150" data-translate="trackSearch">Search</button>
+                </div>
+            </form>
+            <div id="tracking-status-container" class="bg-white p-6 rounded-xl shadow hidden">
+                <h3 class="text-xl font-bold text-gray-800 mb-4" data-translate="orderStatusPrefix">Order <span id="display-order-id" class="text-orange-600"></span> Status</h3>
+                <div class="timeline" id="delivery-timeline"></div>
+                <p class="mt-6 text-sm text-gray-600" data-translate="trackingEstimate">Delivery Estimate: **3 - 5 business days** within Karnataka.</p>
+            </div>
+             <div id="tracking-initial-prompt" class="bg-blue-50 p-6 rounded-xl border border-blue-200">
+                <p class="text-blue-700 font-semibold" data-translate="trackingInitialPrompt">Enter your order ID above to see the live status...</p>
+            </div>
+        </div>
+
+        <div id="about-view" class="view-content hidden">
+             <h2 class="text-3xl font-extrabold text-green-800 mb-4" data-translate="aboutVisionTitle">Our Vision: Direct from Farm to Family</h2>
+            <p class="mb-4 text-gray-700" data-translate="aboutVisionBody">Root Direct was founded on the principle of transparency...</p>
+            <h3 class="text-xl font-bold text-orange-600 mt-6 mb-2" data-translate="coreValuesTitle">Core Values & Goals</h3>
+            <ul class="list-disc list-inside space-y-1 text-gray-700 ml-4">
+                 <li data-translate="valueAuthenticity">**Authenticity:** ...</li>
+                 <li data-translate="valueFairness">**Fairness:** ...</li>
+                 <li data-translate="valueSustainability">**Sustainability:** ...</li>
+                 <li data-translate="valueDonations">**Donations & CSR:** ...</li>
+            </ul>
+             <h3 class="text-xl font-bold text-orange-600 mt-6 mb-2" data-translate="careerTitle">Career & Partnership</h3>
+            <p class="text-gray-700" data-translate="careerBody">Interested in joining our mission...</p>
+        </div>
+
+        <div id="contact-view" class="view-content hidden">
+             <h2 class="text-3xl font-extrabold text-green-800 mb-4" data-translate="contactTitle">Get in Touch</h2>
+            <div class="space-y-4">
+                 <div class="p-4 border rounded-lg bg-green-50">
+                     <h4 class="font-bold text-lg text-green-700" data-translate="supportTitle">Customer Support...</h4>
+                     <p class="text-gray-700" data-translate="supportBody">For order inquiries...</p>
+                     <a href="https://wa.me/919743919325" target="_blank" class="text-orange-600 font-semibold hover:text-orange-700 flex items-center mt-1">
+                        +91 9743919325
+                     </a>
+                 </div>
+                 <div class="p-4 border rounded-lg bg-yellow-50">
+                     <h4 class="font-bold text-lg text-yellow-800" data-translate="officeTitle">Operational Office</h4>
+                     <p class="text-gray-700" data-translate="officeBody">Root Direct HQ...</p>
+                     <p class="text-sm text-gray-500 mt-1" data-translate="officeNote">Visit by appointment...</p>
+                 </div>
+                 <div class="p-4 border rounded-lg bg-red-50">
+                     <h4 class="font-bold text-lg text-red-700" data-translate="farmerTitle">Farmer Partnership...</h4>
+                     <p class="text-gray-700" data-translate="farmerBody">Farmers interested...</p>
+                 </div>
+            </div>
+        </div>
+
     </main>
 
     <!-- Footer / Cart Summary -->
     <footer class="bg-white border-t border-gray-200 sticky bottom-0 z-50">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3 flex justify-between items-center">
             <div class="text-lg font-semibold text-gray-700">
-                <span id="cartItems">Items: 0</span> | <span id="cartTotal">Total: ₹0.00</span>
+                <span data-translate="items">Items</span>: <span id="cart-item-count">0</span> | <span data-translate="total">Total</span>: <span id="cart-total" class="text-orange-600 font-bold">₹0.00</span>
             </div>
-            <button id="proceedToOrderButton" class="px-6 py-3 bg-[#38A169] text-white font-bold rounded-lg shadow-xl hover:bg-green-700 transition duration-150 disabled:opacity-50" disabled>
+            <button id="proceedToOrderButton" class="px-6 py-3 bg-[#38A169] text-white font-bold rounded-lg shadow-xl hover:bg-green-700 transition duration-150 disabled:opacity-50" disabled data-translate="proceedToOrder">
                 Proceed to Order
             </button>
         </div>
     </footer>
 
-    <!-- Modals (Sign In / Order) -->
-
-    <!-- Auth Modal -->
+    <!-- Modals (Auth, Order) -->
     <div id="authModal" class="modal">
         <div class="modal-content">
-            <h3 class="text-2xl font-bold mb-6 text-[#38A169]">Sign In / Register</h3>
-            <p class="mb-4 text-gray-600">Sign in to manage your profile and view past orders.</p>
-
+            <h3 class="text-2xl font-bold mb-6 text-[#38A169]" data-translate-signin-title="signInRegisterTitle">Sign In / Register</h3>
+            <p class="mb-4 text-gray-600" data-translate-signin-desc="signInRegisterDesc">Sign in to manage your profile and view past orders.</p>
             <form id="authForm" class="space-y-4">
-                <input type="email" id="authEmail" placeholder="Email" required class="w-full p-3 border border-gray-300 rounded-lg focus:ring focus:ring-green-200">
-                <input type="password" id="authPassword" placeholder="Password (min 6 characters)" required class="w-full p-3 border border-gray-300 rounded-lg focus:ring focus:ring-green-200">
-
-                <button type="submit" id="authSubmitButton" class="w-full p-3 bg-[#38A169] text-white font-bold rounded-lg shadow-md hover:bg-green-700 transition duration-150">Sign In</button>
-                <div class="text-center text-sm">
-                    <button type="button" id="toggleAuthMode" class="text-[#38A169] hover:underline">New Customer? Create Account</button>
-                </div>
-                <button type="button" id="closeAuthModal" class="w-full p-3 mt-2 text-gray-600 hover:text-gray-900 transition duration-150">Close</button>
-                <p id="authMessage" class="text-center text-red-500 font-semibold"></p>
+                 <input type="email" id="authEmail" placeholder="Email" required class="w-full p-3 border border-gray-300 rounded-lg focus:ring focus:ring-green-200">
+                 <input type="password" id="authPassword" placeholder="Password (min 6 characters)" required class="w-full p-3 border border-gray-300 rounded-lg focus:ring focus:ring-green-200">
+                 <button type="submit" id="authSubmitButton" class="w-full p-3 bg-[#38A169] text-white font-bold rounded-lg shadow-md hover:bg-green-700 transition duration-150" data-translate-signin="signIn">Sign In</button>
+                 <div class="text-center text-sm">
+                     <button type="button" id="toggleAuthMode" class="text-[#38A169] hover:underline" data-translate-create="createAccountLink" data-translate-login="loginLink">New Customer? Create Account</button>
+                 </div>
+                 <button type="button" id="closeAuthModal" class="w-full p-3 mt-2 text-gray-600 hover:text-gray-900 transition duration-150" data-translate="close">Close</button>
+                 <p id="authMessage" class="text-center text-red-500 font-semibold"></p>
             </form>
         </div>
     </div>
-
-    <!-- Order Modal (Step 1: Delivery Details) -->
+    
     <div id="orderModal" class="modal">
         <div class="modal-content">
-            <h3 class="text-2xl font-bold mb-6 text-orange-500" id="orderModalTitle">1. Delivery Details</h3>
-
+            <h3 class="text-2xl font-bold mb-6 text-orange-500" id="orderModalTitle" data-translate="deliveryDetailsTitle">1. Delivery Details</h3>
+            
             <form id="deliveryForm" class="space-y-4">
-                <label class="block text-gray-700 font-semibold">Your Full Name</label>
-                <input type="text" id="deliveryName" placeholder="Rakesh" required class="w-full p-3 border border-gray-300 rounded-lg focus:ring focus:ring-orange-200">
-
-                <label class="block text-gray-700 font-semibold">WhatsApp Mobile Number</label>
-                <input type="tel" id="deliveryMobile" placeholder="9743919325" required pattern="[0-9]{10}" class="w-full p-3 border border-gray-300 rounded-lg focus:ring focus:ring-orange-200">
-
-                <label class="block text-gray-700 font-semibold">Delivery Address (Within Karnataka)</label>
-                <textarea id="deliveryAddress" placeholder="Karnataka" required class="w-full p-3 border border-gray-300 rounded-lg focus:ring focus:ring-orange-200 h-24"></textarea>
-
-                <button type="submit" class="w-full p-3 bg-orange-500 text-white font-bold rounded-lg shadow-md hover:bg-orange-600 transition duration-150">Next: View Payment Options</button>
-                <button type="button" id="cancelOrder" class="w-full p-3 mt-2 text-gray-600 hover:text-gray-900 transition duration-150">Cancel</button>
+                 <label class="block text-gray-700 font-semibold" data-translate="yourName">Your Full Name</label>
+                 <input type="text" id="deliveryName" placeholder="" required class="w-full p-3 border border-gray-300 rounded-lg focus:ring focus:ring-orange-200">
+                 <label class="block text-gray-700 font-semibold" data-translate="phoneWhatsapp">WhatsApp Mobile Number</label>
+                 <input type="tel" id="deliveryMobile" placeholder="e.g., 9876543210 (10 digits)" required pattern="[0-9]{10}" class="w-full p-3 border border-gray-300 rounded-lg focus:ring focus:ring-orange-200">
+                 <label class="block text-gray-700 font-semibold" data-translate="addressKarnataka">Delivery Address (Within Karnataka)</label>
+                 <textarea id="deliveryAddress" placeholder="" required class="w-full p-3 border border-gray-300 rounded-lg focus:ring focus:ring-orange-200 h-24"></textarea>
+                 <button type="submit" class="w-full p-3 bg-orange-500 text-white font-bold rounded-lg shadow-md hover:bg-orange-600 transition duration-150" data-translate="nextPayment">Next: View Payment Options</button>
+                 <button type="button" id="cancelOrder" class="w-full p-3 mt-2 text-gray-600 hover:text-gray-900 transition duration-150" data-translate="cancel">Cancel</button>
             </form>
 
             <div id="paymentDetails" class="hidden">
-                <p class="text-lg font-bold mt-4">Order Summary:</p>
-                <ul id="orderSummaryList" class="list-disc list-inside space-y-1 text-gray-700 mb-4 ml-4"></ul>
-                <p class="text-xl font-extrabold text-orange-600">Grand Total: <span id="paymentTotal"></span></p>
+                 <h3 class="text-2xl font-bold mb-6 text-orange-500" data-translate="paymentConfirmationTitle">2. Confirm Order & Payment</h3>
+                 <p class="text-lg font-bold mt-4" data-translate="orderSummaryTitle">Order Summary:</p>
+                 <ul id="orderSummaryList" class="list-disc list-inside space-y-1 text-gray-700 mb-4 ml-4"></ul>
+                 <p class="text-xl font-extrabold text-orange-600" data-translate="grandTotal">Grand Total: <span id="paymentTotal"></span></p>
 
-                <div class="mt-6 space-y-4">
-                    <label class="block text-gray-700 font-semibold">Payment Option</label>
-                    <div class="flex items-center space-x-4">
-                        <input type="radio" id="paymentCOD" name="paymentOption" value="COD" checked class="form-radio text-orange-500">
-                        <label for="paymentCOD" class="font-medium">Cash on Delivery (COD)</label>
-                    </div>
-                    <div class="flex items-center space-x-4">
-                        <input type="radio" id="paymentOnline" name="paymentOption" value="Online" disabled class="form-radio text-gray-400">
-                        <label for="paymentOnline" class="font-medium text-gray-400">Online Payment (Coming Soon)</label>
-                    </div>
-                </div>
+                 <div class="mt-6 space-y-4">
+                     <label class="block text-gray-700 font-semibold" data-translate="paymentOptionTitle">Payment Option</label>
+                     <div class="flex items-center space-x-4 p-3 bg-yellow-50 border border-yellow-200 rounded-lg">
+                         <input type="radio" id="paymentCOD" name="paymentOption" value="COD" checked class="form-radio text-orange-500 focus:ring-orange-500">
+                         <label for="paymentCOD" class="font-medium text-yellow-800" data-translate="codTitleOption">Cash on Delivery (COD)</label>
+                     </div>
+                     <div class="flex items-center space-x-4 p-3 bg-gray-100 border border-gray-200 rounded-lg">
+                         <input type="radio" id="paymentOnline" name="paymentOption" value="Online" disabled class="form-radio text-gray-400">
+                         <label for="paymentOnline" class="font-medium text-gray-400" data-translate="onlinePaymentOption">Online Payment (UPI/Card - Coming Soon)</label>
+                     </div>
+                 </div>
 
-                <button id="placeOrderButton" class="w-full p-3 mt-8 bg-[#38A169] text-white font-bold rounded-lg shadow-md hover:bg-green-700 transition duration-150">Place Final Order</button>
-                <button type="button" id="backToDelivery" class="w-full p-3 mt-2 text-gray-600 hover:text-gray-900 transition duration-150">Back to Delivery Details</button>
+                 <button id="placeOrderButton" class="w-full p-3 mt-8 bg-[#38A169] text-white font-bold rounded-lg shadow-md hover:bg-green-700 transition duration-150" data-translate="placeOrderButton">Place Final Order</button>
+                 <button type="button" id="backToDelivery" class="w-full p-3 mt-2 text-gray-600 hover:text-gray-900 transition duration-150" data-translate="goBack">Back to Delivery Details</button>
             </div>
         </div>
     </div>
 
+    <!-- Toast Container -->
+    <div id="toast-container"></div>
 
+    <!-- Firebase SDK Imports & Main App Logic (Moved to end of body) -->
     <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-        import { getAuth, signInAnonymously, signInWithCustomToken, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-        import { getFirestore, doc, getDoc, setDoc, onSnapshot, collection, addDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
-        import { setLogLevel } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+        // Import necessary functions ONLY ONCE
+        import { initializeApp, deleteApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getAuth, signInAnonymously, signInWithCustomToken, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, onAuthStateChanged, setPersistence, browserSessionPersistence } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getFirestore, doc, getDoc, setDoc, onSnapshot, collection, addDoc, setLogLevel, enableIndexedDbPersistence, terminate } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
-        // Firebase Setup
-        setLogLevel('Debug');
-        const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
+        // --- Global Variables & Config ---
+        setLogLevel('debug'); // Set log level for debugging
+        const appId = typeof __app_id !== 'undefined' ? __app_id : 'root-direct-dev';
         const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : {};
         const initialAuthToken = typeof __initial_auth_token !== 'undefined' ? __initial_auth_token : null;
 
         let app, db, auth, userId = null;
-        let isAuthReady = false;
+        let authStateInitialized = false;
         let products = [];
         let cart = {};
+        let cartListenerUnsubscribe = null;
+        let isSignInMode = true; // For Auth Modal toggle
 
-        // Hardcoded product data to initialize the DB on first login
+        // Default products (used if Firestore is empty on first load)
         const defaultProducts = [
-            { id: 'rag-01', name: 'Ragi (Finger Millet)', titleColor: 'text-white bg-[#38A169]', basePrice: 35.00, sizes: [{ size: '500 g', price: 35.00 }, { size: '1 kg', price: 70.00 }, { size: '5 kg', price: 340.00 }] },
-            { id: 'jow-01', name: 'Jowar (Sorghum)', titleColor: 'text-white bg-orange-500', basePrice: 25.00, sizes: [{ size: '500 g', price: 25.00 }, { size: '1 kg', price: 50.00 }, { size: '5 kg', price: 250.00 }] },
-            { id: 'kob-01', name: 'Dry Coconut (Kobbari)', titleColor: 'text-white bg-yellow-600', basePrice: 90.00, sizes: [{ size: '500 g', price: 90.00 }, { size: '1 kg', price: 180.00 }, { size: '5 kg', price: 900.00 }] },
-            { id: 'nut-01', name: 'Groundnut (Peanut Seeds)', titleColor: 'text-white bg-teal-600', basePrice: 80.00, sizes: [{ size: '500 g', price: 80.00 }, { size: '1 kg', price: 150.00 }, { size: '5 kg', price: 750.00 }] },
-            { id: 'dal-01', name: 'Toor Dal (Pigeon Pea Split)', titleColor: 'text-white bg-blue-400', basePrice: 80.00, sizes: [{ size: '500 g', price: 80.00 }, { size: '1 kg', price: 155.00 }, { size: '5 kg', price: 750.00 }] },
-            { id: 'nav-01', name: 'Navane (Foxtail Millet)', titleColor: 'text-white bg-orange-400', basePrice: 45.00, sizes: [{ size: '500 g', price: 45.00 }, { size: '1 kg', price: 85.00 }, { size: '5 kg', price: 400.00 }] },
-            { id: 'moo-01', name: 'Local Green Moong Dal', titleColor: 'text-white bg-yellow-400', basePrice: 40.00, sizes: [{ size: '500 g', price: 40.00 }, { size: '1 kg', price: 80.00 }, { size: '5 kg', price: 400.00 }] },
-            { id: 'gnut-oil', name: 'Cold Pressed Groundnut Oil', titleColor: 'text-white bg-teal-800', basePrice: 380.00, sizes: [{ size: '1 Litre', price: 380.00 }] },
-            { id: 'coco-oil', name: 'Cold Pressed Coconut Oil', titleColor: 'text-white bg-teal-800', basePrice: 350.00, sizes: [{ size: '1 Litre', price: 350.00 }] },
-            { id: 'castor-seed', name: 'Castor Seeds', titleColor: 'text-white bg-purple-400', basePrice: 35.00, sizes: [{ size: '500 g', price: 35.00 }, { size: '1 kg', price: 70.00 }, { size: '5 kg', price: 350.00 }] },
-            { id: 'castor-oil', name: 'Cold Pressed Castor Oil', titleColor: 'text-white bg-teal-800', basePrice: 300.00, sizes: [{ size: '1 Litre', price: 300.00 }] }
+             { id: 'rag-01', name: 'Ragi (Finger Millet)', descriptionKey: 'ragiDesc', titleColor: 'text-white bg-[#38A169]', basePrice: 35.00, images: ['https://placehold.co/300x200/34D399/ffffff?text=Ragi+1', 'https://placehold.co/300x200/10B981/ffffff?text=Ragi+2'], sizes: [{ size: '500 g', price: 35.00 }, { size: '1 kg', price: 70.00 }, { size: '5 kg', price: 340.00 }] },
+             { id: 'jow-01', name: 'Jowar (Sorghum)', descriptionKey: 'jowarDesc', titleColor: 'text-white bg-orange-500', basePrice: 25.00, images: ['https://placehold.co/300x200/F97316/ffffff?text=Jowar+1', 'https://placehold.co/300x200/EA580C/ffffff?text=Jowar+2'], sizes: [{ size: '500 g', price: 25.00 }, { size: '1 kg', price: 50.00 }, { size: '5 kg', price: 250.00 }] },
+             { id: 'kob-01', name: 'Dry Coconut (Kobbari)', descriptionKey: 'kobbariDesc', titleColor: 'text-white bg-yellow-600', basePrice: 90.00, images: ['https://placehold.co/300x200/CA8A04/ffffff?text=Kobbari+1', 'https://placehold.co/300x200/A16207/ffffff?text=Kobbari+2'], sizes: [{ size: '500 g', price: 90.00 }, { size: '1 kg', price: 180.00 }, { size: '5 kg', price: 900.00 }] },
+             { id: 'nut-01', name: 'Groundnut (Peanut Seeds)', descriptionKey: 'nutSeedDesc', titleColor: 'text-white bg-teal-600', basePrice: 80.00, images: ['https://placehold.co/300x200/0D9488/ffffff?text=NutSeed+1', 'https://placehold.co/300x200/047857/ffffff?text=NutSeed+2'], sizes: [{ size: '500 g', price: 80.00 }, { size: '1 kg', price: 150.00 }, { size: '5 kg', price: 750.00 }] },
+             { id: 'dal-01', name: 'Toor Dal (Pigeon Pea Split)', descriptionKey: 'toorDalDesc', titleColor: 'text-white bg-blue-400', basePrice: 80.00, images: ['https://placehold.co/300x200/2563EB/ffffff?text=ToorDal+1', 'https://placehold.co/300x200/1D4ED8/ffffff?text=ToorDal+2'], sizes: [{ size: '500 g', price: 80.00 }, { size: '1 kg', price: 155.00 }, { size: '5 kg', price: 750.00 }] },
+             { id: 'nav-01', name: 'Navane (Foxtail Millet)', descriptionKey: 'navaneDesc', titleColor: 'text-white bg-orange-400', basePrice: 45.00, images: ['https://placehold.co/300x200/D97706/ffffff?text=Navane+1', 'https://placehold.co/300x200/B45309/ffffff?text=Navane+2'], sizes: [{ size: '500 g', price: 45.00 }, { size: '1 kg', price: 85.00 }, { size: '5 kg', price: 400.00 }] },
+             { id: 'moo-01', name: 'Local Green Moong Dal', descriptionKey: 'moongDesc', titleColor: 'text-white bg-yellow-400', basePrice: 40.00, images: ['https://placehold.co/300x200/65A30D/ffffff?text=Moong+1', 'https://placehold.co/300x200/4D7C0F/ffffff?text=Moong+2'], sizes: [{ size: '500 g', price: 40.00 }, { size: '1 kg', price: 80.00 }, { size: '5 kg', price: 400.00 }] },
+             { id: 'gnut-oil', name: 'Cold Pressed Groundnut Oil', descriptionKey: 'gnutOilDesc', titleColor: 'text-white bg-teal-800', basePrice: 380.00, images: ['https://placehold.co/300x200/059669/ffffff?text=G.Nut+Oil+1'], sizes: [{ size: '1 Litre', price: 380.00 }] },
+             { id: 'coco-oil', name: 'Cold Pressed Coconut Oil', descriptionKey: 'cocoOilDesc', titleColor: 'text-white bg-teal-800', basePrice: 350.00, images: ['https://placehold.co/300x200/0D9488/ffffff?text=Coco+Oil+1'], sizes: [{ size: '1 Litre', price: 350.00 }] },
+             { id: 'castor-seed', name: 'Castor Seeds', descriptionKey: 'castorSeedDesc', titleColor: 'text-white bg-purple-400', basePrice: 35.00, images: ['https://placehold.co/300x200/8B5CF6/ffffff?text=Castor+Seed+1'], sizes: [{ size: '500 g', price: 35.00 }, { size: '1 kg', price: 70.00 }, { size: '5 kg', price: 350.00 }] },
+             { id: 'castor-oil', name: 'Cold Pressed Castor Oil', descriptionKey: 'castorOilDesc', titleColor: 'text-white bg-teal-800', basePrice: 300.00, images: ['https://placehold.co/300x200/34D399/ffffff?text=Castor+Oil+1'], sizes: [{ size: '1 Litre', price: 300.00 }] }
         ];
 
-        // --- Utility Functions ---
-
-        // Simple function to retry API calls with exponential backoff
-        async function fetchWithRetry(fn, maxRetries = 3, delay = 1000) {
-            for (let i = 0; i < maxRetries; i++) {
-                try {
-                    return await fn();
-                } catch (error) {
-                    if (i === maxRetries - 1) throw error;
-                    console.warn(`Retry ${i + 1}/${maxRetries}: Error fetching data. Retrying in ${delay}ms.`, error);
-                    await new Promise(resolve => setTimeout(resolve, delay));
-                    delay *= 2;
-                }
-            }
-        }
-
-        function calculateCart() {
-            let totalItems = 0;
-            let totalAmount = 0;
-
-            for (const productId in cart) {
-                const item = cart[productId];
-                totalItems += item.quantity;
-                totalAmount += item.quantity * item.price;
-            }
-
-            document.getElementById('cartItems').textContent = `Items: ${totalItems}`;
-            document.getElementById('cartTotal').textContent = `Total: ₹${totalAmount.toFixed(2)}`;
-            
-            // Proceed button is enabled if there are items AND the user is NOT anonymous
-            const proceedButton = document.getElementById('proceedToOrderButton');
-            const canProceed = totalItems > 0 && userId && !auth?.currentUser?.isAnonymous;
-            proceedButton.disabled = !canProceed;
-
-            // Save cart to DB
-            if (isAuthReady && userId && !auth?.currentUser?.isAnonymous) {
-                saveCartToDB(cart).catch(err => console.error("Failed to save cart:", err));
-            }
-        }
-
-        // --- Database Path Helpers ---
-
-        function getProductsDocRef(db, userId) {
-            return doc(db, 'artifacts', appId, 'users', userId, 'config', 'products');
-        }
-
-        function getCartDocRef(db, userId) {
-            return doc(db, 'artifacts', appId, 'users', userId, 'config', 'cart');
-        }
-
-        function getOrdersCollectionRef(db, userId) {
-             // Store orders in the public collection for future admin access
-             return collection(db, 'artifacts', appId, 'public', 'data', 'orders');
-        }
+        // --- Translation Data ---
+         let currentLang = 'en';
+         const translations = {
+             en: { /* ... English translations ... */ },
+             kn: { /* ... Kannada translations ... */ }
+         };
+         // Populate translations object (same as previous version)
+        translations.en = {
+            appTitle: 'Root Direct', appCaption: "Sourced directly from the heart of Karnataka's dedicated farmers to your table.",
+            navProducts: 'Products', navTrack: 'Track Order', navAbout: 'About Us', navContact: 'Contact & Support', langToggle: 'ಕನ್ನಡ (KN)',
+            seasonalStaples: 'Seasonal Staples',
+            ragiDesc: 'Premium Ragi (Finger Millet)', jowarDesc: 'Jowar (Sorghum)', kobbariDesc: 'Dry Coconut (Kobbari)', nutSeedDesc: 'Groundnut (Peanut Seeds)', toorDalDesc: 'Toor Dal (Pigeon Pea Split)', navaneDesc: 'Navane (Foxtail Millet)', moongDesc: 'Local Green Moong Dal', gnutOilDesc: 'Cold Pressed Groundnut Oil', cocoOilDesc: 'Cold Pressed Coconut Oil', castorSeedDesc: 'Castor Seeds', castorOilDesc: 'Cold Pressed Castor Oil',
+            items: 'Items', total: 'Total', proceedToOrder: 'Proceed to Order',
+            deliveryDetailsTitle: '1. Delivery Details', yourName: 'Your Full Name', phoneWhatsapp: 'WhatsApp Mobile Number', addressKarnataka: 'Delivery Address (Within Karnataka)', nextPayment: 'Next: View Payment Options', cancel: 'Cancel',
+            paymentConfirmationTitle: '2. Confirm Order & Payment', orderTotalPayment: 'Order Total:',
+            codTitleOption: 'Cash on Delivery (COD)', onlinePaymentOption: 'Online Payment (UPI/Card - Coming Soon)',
+            orderSummaryTitle: 'Order Summary:', grandTotal: 'Grand Total:', placeOrderButton: 'Place Final Order', goBack: 'Back to Delivery Details',
+            trackTitle: 'Track Your Order', enterOrderID: 'Enter your Order ID (e.g., RD1234)', trackSearch: 'Search', orderStatusPrefix: 'Order', trackingEstimate: 'Delivery Estimate: **3 - 5 business days** within Karnataka.', trackingInitialPrompt: 'Enter your order ID above to see the live status...',
+            stepProcessingTitle: 'Order Processing', stepProcessingDetail: 'Order received and inventory checked.', stepShippedTitle: 'Shipped from Hub', stepShippedDetail: 'Order packaged and handed to delivery partner.', stepTransitTitle: 'In Transit', stepTransitDetail: 'Out for delivery in your local area.', stepDeliveredTitle: 'Delivered', stepDeliveredDetail: 'Order successfully delivered.',
+            aboutVisionTitle: 'Our Vision: Direct from Farm to Family', aboutVisionBody: 'Root Direct was founded on the principle of transparency...', coreValuesTitle: 'Core Values & Goals', valueAuthenticity: '**Authenticity:** ...', valueFairness: '**Fairness:** ...', valueSustainability: '**Sustainability:** ...', valueDonations: '**Donations & CSR:** ...', careerTitle: 'Career & Partnership', careerBody: 'Interested in joining our mission...',
+            contactTitle: 'Get in Touch', supportTitle: 'Customer Support...', supportBody: 'For order inquiries...', officeTitle: 'Operational Office', officeBody: 'Root Direct HQ...', officeNote: 'Visit by appointment...', farmerTitle: 'Farmer Partnership...', farmerBody: 'Farmers interested...',
+            signIn: 'Sign In', signOut: 'Sign Out', signInRegisterTitle: 'Sign In / Register', signInRegisterDesc: 'Sign in to manage your profile and view past orders.', createAccountLink: 'New Customer? Create Account', loginLink: 'Already a Customer? Sign In', close: 'Close',
+            toastOrderSuccess: 'Order placed successfully!', toastOrderError: 'Error placing order. Please try again.', toastCartEmpty: 'Your cart is empty!', toastSignInRequired: 'Please sign in or create an account before placing an order.', toastAuthError: 'Authentication Error:', toastProductLoadError: 'Error loading products.', toastCartLoadError: 'Error loading cart.',
+            noProducts: 'No products available currently.', toastEnterOrderId: 'Please enter an Order ID.', toastTrackingStatusFound: 'Tracking status found.'
+        };
+        translations.kn = {
+            appTitle: 'ರೂಟ್ ಡೈರೆಕ್ಟ್', appCaption: 'ಕರ್ನಾಟಕದ ಸಮರ್ಪಿತ ರೈತರಿಂದ ನೇರವಾಗಿ ನಿಮ್ಮ ಮನೆಗೆ ತಲುಪಿಸಲಾಗುತ್ತದೆ.',
+            navProducts: 'ಉತ್ಪನ್ನಗಳು', navTrack: 'ಆರ್ಡರ್ ಟ್ರ್ಯಾಕ್ ಮಾಡಿ', navAbout: 'ನಮ್ಮ ಬಗ್ಗೆ', navContact: 'ಸಂಪರ್ಕ ಮತ್ತು ಬೆಂಬಲ', langToggle: 'English (EN)',
+            seasonalStaples: 'ಕಾಲೋಚಿತ ಮುಖ್ಯ ಬೆಳೆಗಳು',
+            ragiDesc: 'ಪ್ರೀಮಿಯಂ ರಾಗಿ (Finger Millet)', jowarDesc: 'ಜೋಳ (Sorghum)', kobbariDesc: 'ಒಣ ಕೊಬ್ಬರಿ (Dry Coconut)', nutSeedDesc: 'ಶೇಂಗಾ ಬೀಜ (ಕಡಲೆಬೀಜ)', toorDalDesc: 'ತೊಗರಿ ಬೇಳೆ (Pigeon Pea Split)', navaneDesc: 'ನವಣೆ (Foxtail Millet)', moongDesc: 'ಸ್ಥಳೀಯ ಹೆಸರು ಬೇಳೆ', gnutOilDesc: 'ಕೋಲ್ಡ್ ಪ್ರೆಸ್ಡ್ ಶೇಂಗಾ ಎಣ್ಣೆ', cocoOilDesc: 'ಕೋಲ್ಡ್ ಪ್ರೆಸ್ಡ್ ತೆಂಗಿನ ಎಣ್ಣೆ', castorSeedDesc: 'ಹರಳು ಬೀಜಗಳು', castorOilDesc: 'ಕೋಲ್ಡ್ ಪ್ರೆಸ್ಡ್ ಹರಳು ಎಣ್ಣೆ',
+            items: 'ಐಟಂಗಳು', total: 'ಒಟ್ಟು', proceedToOrder: 'ಆರ್ಡರ್ ಮುಂದುವರಿಸಿ',
+            deliveryDetailsTitle: '1. ವಿತರಣಾ ವಿವರಗಳು', yourName: 'ನಿಮ್ಮ ಪೂರ್ಣ ಹೆಸರು', phoneWhatsapp: 'WhatsApp ಮೊಬೈಲ್ ಸಂಖ್ಯೆ', addressKarnataka: 'ವಿತರಣಾ ವಿಳಾಸ (ಕರ್ನಾಟಕದೊಳಗೆ)', nextPayment: 'ಮುಂದೆ: ಪಾವತಿ ಆಯ್ಕೆಗಳನ್ನು ನೋಡಿ', cancel: 'ರದ್ದುಮಾಡಿ',
+            paymentConfirmationTitle: '2. ಪಾವತಿ ಮತ್ತು ದೃಢೀಕರಣ', orderTotalPayment: 'ಆರ್ಡರ್ ಒಟ್ಟು:',
+            codTitleOption: 'ಕ್ಯಾಶ್ ಆನ್ ಡೆಲಿವರಿ (COD)', onlinePaymentOption: 'ಆನ್‌ಲೈನ್ ಪಾವತಿ (UPI/ಕಾರ್ಡ್ - ಶೀಘ್ರದಲ್ಲೇ ಬರಲಿದೆ)',
+            orderSummaryTitle: 'ಆರ್ಡರ್ ಸಾರಾಂಶ:', grandTotal: 'ಒಟ್ಟು ಮೊತ್ತ:', placeOrderButton: 'ಅಂತಿಮ ಆರ್ಡರ್ ಮಾಡಿ', goBack: 'ವಿತರಣಾ ವಿವರಗಳಿಗೆ ಹಿಂತಿರುಗಿ',
+            trackTitle: 'ನಿಮ್ಮ ಆರ್ಡರ್ ಟ್ರ್ಯಾಕ್ ಮಾಡಿ', enterOrderID: 'ನಿಮ್ಮ ಆರ್ಡರ್ ID ನಮೂದಿಸಿ (ಉದಾ: RD1234)', trackSearch: 'ಹುಡುಕಿ', orderStatusPrefix: 'ಆರ್ಡರ್', trackingEstimate: 'ವಿತರಣಾ ಅಂದಾಜು: **3 - 5 ವ್ಯವಹಾರ ದಿನಗಳು** ಕರ್ನಾಟಕದೊಳಗೆ.', trackingInitialPrompt: 'ಲೈವ್ ಸ್ಥಿತಿಯನ್ನು ನೋಡಲು ಮೇಲಿನ ನಿಮ್ಮ ಆರ್ಡರ್ ID ಅನ್ನು ನಮೂದಿಸಿ...',
+            stepProcessingTitle: 'ಆರ್ಡರ್ ಪ್ರಕ್ರಿಯೆಗೊಳಿಸಲಾಗುತ್ತಿದೆ', stepProcessingDetail: 'ಆರ್ಡರ್ ಸ್ವೀಕರಿಸಲಾಗಿದೆ...', stepShippedTitle: 'ಹಬ್‌ನಿಂದ ರವಾನೆಯಾಗಿದೆ', stepShippedDetail: 'ಆರ್ಡರ್ ಪ್ಯಾಕ್ ಮಾಡಲಾಗಿದೆ...', stepTransitTitle: 'ಸಾಗಣೆಯಲ್ಲಿ', stepTransitDetail: 'ವಿತರಣೆಗಾಗಿ ಹೊರಟಿದೆ...', stepDeliveredTitle: 'ತಲುಪಿಸಲಾಗಿದೆ', stepDeliveredDetail: 'ಆರ್ಡರ್ ಯಶಸ್ವಿಯಾಗಿ ತಲುಪಿಸಲಾಗಿದೆ.',
+            aboutVisionTitle: 'ನಮ್ಮ ದೃಷ್ಟಿ: ಹೊಲದಿಂದ ಕುಟುಂಬಕ್ಕೆ ನೇರ', aboutVisionBody: 'ಪಾರದರ್ಶಕತೆ ಮತ್ತು ನ್ಯಾಯಯುತ ವ್ಯಾಪಾರದ ತತ್ವದ ಮೇಲೆ...', coreValuesTitle: 'ಕೋರ್ ಮೌಲ್ಯಗಳು ಮತ್ತು ಗುರಿಗಳು', valueAuthenticity: '**ದೃಢೀಕರಣ:** ...', valueFairness: '**ನ್ಯಾಯಸಮ್ಮತತೆ:** ...', valueSustainability: '**ಸುಸ್ಥಿರತೆ:** ...', valueDonations: '**ದೇಣಿಗೆಗಳು ಮತ್ತು CSR:** ...', careerTitle: 'ವೃತ್ತಿ ಮತ್ತು ಪಾಲುದಾರಿಕೆ', careerBody: 'ನಮ್ಮ ಮಿಷನ್‌ಗೆ ಸೇರಲು ಆಸಕ್ತಿ ಇದೆಯೇ...',
+            contactTitle: 'ಸಂಪರ್ಕದಲ್ಲಿರಿ', supportTitle: 'ಗ್ರಾಹಕ ಬೆಂಬಲ...', supportBody: 'ಆರ್ಡರ್ ವಿಚಾರಣೆಗಳಿಗಾಗಿ...', officeTitle: 'ಕಾರ್ಯಾಚರಣಾ ಕಚೇರಿ', officeBody: 'ರೂಟ್ ಡೈರೆಕ್ಟ್ HQ...', officeNote: 'ನೇಮಕಾತಿಯ ಮೂಲಕ ಮಾತ್ರ...', farmerTitle: 'ರೈತ ಪಾಲುದಾರಿಕೆ...', farmerBody: 'ಪಾಲುದಾರಿಕೆಗೆ ಆಸಕ್ತಿ ಹೊಂದಿರುವ ರೈತರು...',
+            signIn: 'ಸೈನ್ ಇನ್', signOut: 'ಸೈನ್ ಔಟ್', signInRegisterTitle: 'ಸೈನ್ ಇನ್ / ನೋಂದಾಯಿಸಿ', signInRegisterDesc: 'ನಿಮ್ಮ ಪ್ರೊಫೈಲ್ ನಿರ್ವಹಿಸಲು ಮತ್ತು ಹಿಂದಿನ ಆರ್ಡರ್‌ಗಳನ್ನು ವೀಕ್ಷಿಸಲು ಸೈನ್ ಇನ್ ಮಾಡಿ.', createAccountLink: 'ಹೊಸ ಗ್ರಾಹಕ? ಖಾತೆ ರಚಿಸಿ', loginLink: 'ಈಗಾಗಲೇ ಗ್ರಾಹಕ? ಸೈನ್ ಇನ್ ಮಾಡಿ', close: 'ಮುಚ್ಚಿ',
+            toastOrderSuccess: 'ಆರ್ಡರ್ ಯಶಸ್ವಿಯಾಗಿ ಮಾಡಲಾಗಿದೆ!', toastOrderError: 'ಆರ್ಡರ್ ಮಾಡುವಲ್ಲಿ ದೋಷ. ದಯವಿಟ್ಟು ಮತ್ತೆ ಪ್ರಯತ್ನಿಸಿ.', toastCartEmpty: 'ನಿಮ್ಮ ಕಾರ್ಟ್ ಖಾಲಿಯಾಗಿದೆ!', toastSignInRequired: 'ಆರ್ಡರ್ ಮಾಡುವ ಮೊದಲು ದಯವಿಟ್ಟು ಸೈನ್ ಇನ್ ಮಾಡಿ ಅಥವಾ ಖಾತೆಯನ್ನು ರಚಿಸಿ.', toastAuthError: 'ದೃಢೀಕರಣ ದೋಷ:', toastProductLoadError: 'ಉತ್ಪನ್ನಗಳನ್ನು ಲೋಡ್ ಮಾಡುವಲ್ಲಿ ದೋಷ.', toastCartLoadError: 'ಕಾರ್ಟ್ ಲೋಡ್ ಮಾಡುವಲ್ಲಿ ದೋಷ.',
+            noProducts: 'ಪ್ರಸ್ತುತ ಯಾವುದೇ ಉತ್ಪನ್ನಗಳು ಲಭ್ಯವಿಲ್ಲ.', toastEnterOrderId: 'ದಯವಿಟ್ಟು ಆರ್ಡರ್ ID ನಮೂದಿಸಿ.', toastTrackingStatusFound: 'ಟ್ರ್ಯಾಕಿಂಗ್ ಸ್ಥಿತಿ ಕಂಡುಬಂದಿದೆ.'
+        };
 
 
-        // --- Database Operations ---
+        // --- UI Update & Translation Functions ---
+         function getTranslation(key) {
+             return translations[currentLang][key] || translations['en'][key] || key;
+         }
 
-        async function initializeProducts(db, userId) {
-            const productsDocRef = getProductsDocRef(db, userId);
-            const docSnap = await getDoc(productsDocRef);
+         function updateUIText() {
+             // Update elements with data-translate attribute
+             document.querySelectorAll('[data-translate]').forEach(el => {
+                 const key = el.getAttribute('data-translate');
+                 if (key) el.innerHTML = getTranslation(key);
+             });
+             // Update elements with data-placeholder-translate attribute
+             document.querySelectorAll('[data-placeholder-translate]').forEach(el => {
+                 const key = el.getAttribute('data-placeholder-translate');
+                 if (key) el.placeholder = getTranslation(key);
+             });
+             // Update button texts specifically
+             document.querySelectorAll('[data-translate-signin], [data-translate-signout], [data-translate-create], [data-translate-login], [data-translate-signin-title], [data-translate-signin-desc], [data-translate-close]').forEach(el => {
+                 for (const attr of el.attributes) {
+                     if (attr.name.startsWith('data-translate-')) {
+                         const key = attr.value;
+                         if (key) el.textContent = getTranslation(key);
+                         break; // Assuming only one such attribute per element
+                     }
+                 }
+             });
+             // Special handling for auth toggle button based on state
+             const toggleAuthModeButton = document.getElementById('toggleAuthMode');
+             if (toggleAuthModeButton) {
+                 toggleAuthModeButton.textContent = getTranslation(isSignInMode ? 'createAccountLink' : 'loginLink');
+             }
+             const authSubmitButton = document.getElementById('authSubmitButton');
+              if (authSubmitButton) {
+                  authSubmitButton.textContent = getTranslation(isSignInMode ? 'signIn' : 'createAccount'); // Use 'createAccount' key
+             }
 
-            if (!docSnap.exists()) {
-                // If products don't exist, save the default set
-                console.log("No products found. Initializing with default data.");
-                const data = { products: defaultProducts, lastUpdated: new Date() };
-                // Using merge: true just in case the document exists partially
-                await setDoc(productsDocRef, data, { merge: true }); 
-                return defaultProducts;
-            } else {
-                console.log("Products loaded from database.");
-                return docSnap.data().products || [];
-            }
-        }
 
-        async function saveCartToDB(currentCart) {
-            if (!userId || !db) return;
-            const cartDocRef = getCartDocRef(db, userId);
-            const data = { cart: currentCart, lastUpdated: new Date() };
-            await setDoc(cartDocRef, data);
-        }
+             // Update language toggle button text
+             const langToggle = document.getElementById('lang-toggle');
+             if(langToggle) langToggle.innerText = getTranslation('langToggle');
 
-        async function saveOrderToDB(orderData) {
-            if (!userId || !db) return;
-            const ordersColRef = getOrdersCollectionRef(db, userId);
+             // Re-render products if they exist
+             if (products && products.length > 0) renderProducts(products);
+             else {
+                 // Ensure loading/error indicators are handled if products aren't ready
+                 const loadingIndicator = document.getElementById('loadingIndicator');
+                 const errorIndicator = document.getElementById('errorIndicator');
+                 if (loadingIndicator && !loadingIndicator.classList.contains('hidden')) {
+                     loadingIndicator.textContent = getTranslation('loadingProducts'); // Assuming this key exists
+                 }
+                 if (errorIndicator && !errorIndicator.classList.contains('hidden')) {
+                     errorIndicator.textContent = getTranslation('toastProductLoadError');
+                 }
+             }
 
-            // Add the new order document
-            await addDoc(ordersColRef, {
-                ...orderData,
-                userId: userId,
-                timestamp: new Date()
-            });
-            console.log("Order placed successfully!");
-        }
+             calculateCart(); // Update cart text
 
-        // --- Render Functions ---
+             // Re-render tracking if that view is active
+             if (!document.getElementById('tracking-view')?.classList.contains('hidden')) {
+                 const orderId = document.getElementById('order-id-input')?.value;
+                 if (orderId) simulateTracking(orderId); // Rerender with translations
+             }
+         }
 
-        function renderProducts(currentProducts) {
-            products = currentProducts;
-            const grid = document.getElementById('productGrid');
-            grid.innerHTML = ''; // Clear existing content
-            const loadingIndicator = document.getElementById('loadingIndicator');
-            if(loadingIndicator) loadingIndicator.classList.add('hidden');
+         window.toggleLanguage = function() {
+             currentLang = currentLang === 'en' ? 'kn' : 'en';
+             updateUIText();
+         }
 
-            if (products.length === 0) {
-                grid.innerHTML = '<p class="text-xl text-gray-500 col-span-full text-center py-12">No products available. Please sign in to load the default catalog.</p>';
+        // --- Utility: Toast Notifications ---
+        function showToast(key, type = 'success') {
+            const message = getTranslation(key);
+            const container = document.getElementById('toast-container');
+            if (!container) {
+                console.warn("Toast container not found!");
                 return;
             }
 
-            products.forEach(product => {
-                const card = document.createElement('div');
-                card.className = 'product-card bg-white rounded-xl overflow-hidden shadow-lg border border-gray-100 p-4';
+            const toast = document.createElement('div');
+            toast.className = `toast ${type}`;
+            toast.textContent = `${type === 'error' ? 'Error: ' : ''}${message}`;
+            container.appendChild(toast);
 
-                // Product Title Header
-                const headerBg = product.titleColor.includes('bg-') ? product.titleColor.split(' ').find(c => c.startsWith('bg-')) : 'bg-gray-800';
-                
-                // Ensure the price is displayed only if sizes are defined
-                const sizesHtml = product.sizes.map((sizeOption, index) => {
-                    const cartId = `${product.id}-${index}`;
-                    const currentQty = cart[cartId] ? cart[cartId].quantity : 0;
-                    return `
-                        <div class="flex justify-between items-center py-2 border-t border-gray-100">
-                            <div class="flex flex-col">
-                                <span class="text-lg font-bold text-green-600">₹${sizeOption.price.toFixed(2)}</span>
-                                <span class="text-sm text-gray-500">${sizeOption.size}</span>
-                            </div>
-                            <div class="flex items-center space-x-1">
-                                <button data-cart-id="${cartId}" data-action="decrement" class="qty-button bg-orange-100 text-orange-600 rounded-full hover:bg-orange-200">-</button>
-                                <span id="qty-${cartId}" class="w-8 text-center font-bold text-gray-700">${currentQty}</span>
-                                <button data-cart-id="${cartId}" data-action="increment" class="qty-button bg-green-100 text-green-600 rounded-full hover:bg-green-200">+</button>
-                            </div>
-                        </div>
-                    `;
-                }).join('');
-
-                card.innerHTML = `
-                    <div class="rounded-lg mb-4 text-center p-6 ${headerBg}">
-                        <h3 class="text-4xl font-extrabold text-white">${product.name.split('(')[0].trim()}</h3>
-                        <p class="text-white font-medium">${product.name.includes('(') ? product.name.split('(')[1].replace(')', '').trim() : ''}</p>
-                    </div>
-                    <p class="text-lg font-semibold text-gray-800 mb-4">${product.name}</p>
-                    ${sizesHtml}
-                `;
-
-                grid.appendChild(card);
-            });
-        }
-
-        // --- Event Handlers ---
-
-        function handleCartUpdate(event) {
-            const button = event.target.closest('button');
-            if (!button || !products.length) return; // Exit if not a button or products not loaded
-
-            const cartId = button.dataset.cartId;
-            const action = button.dataset.action;
-
-            if (!cartId) return;
-
-            const [productId, sizeIndexStr] = cartId.split('-');
-            const sizeIndex = parseInt(sizeIndexStr);
-
-            const product = products.find(p => p.id === productId);
-            if (!product || !product.sizes[sizeIndex]) return;
-
-            const sizeOption = product.sizes[sizeIndex];
-
-            // Initialize item if it doesn't exist
-            if (!cart[cartId]) {
-                cart[cartId] = {
-                    productId: productId,
-                    productName: product.name,
-                    size: sizeOption.size,
-                    price: sizeOption.price,
-                    quantity: 0
-                };
-            }
-
-            let newQty = cart[cartId].quantity;
-
-            if (action === 'increment') {
-                newQty++;
-            } else if (action === 'decrement' && newQty > 0) {
-                newQty--;
-            }
-
-            if (newQty > 0) {
-                cart[cartId].quantity = newQty;
-            } else {
-                delete cart[cartId]; // Remove item if quantity is zero
-            }
-
-            // Update UI for the specific item
-            const qtySpan = document.getElementById(`qty-${cartId}`);
-            if (qtySpan) {
-                qtySpan.textContent = newQty;
-            }
-
-            calculateCart();
-        }
-
-        // Custom Alert/Message Box Function (Replaces alert())
-        function showMessageModal(title, message) {
-            console.log(`[Message: ${title}] ${message}`);
-            // Since alert() is forbidden, we use a simple console log
-            // and an aggressive, though temporary, window alert for critical messages.
-            // In a real app, this would be replaced with a beautiful custom modal.
-            window.alert(`${title}\n\n${message}`); 
-        }
-
-        function setupListeners() {
-            // Product Grid click listener for cart updates
-            const productGrid = document.getElementById('productGrid');
-            if(productGrid) productGrid.addEventListener('click', handleCartUpdate);
-
-            // Auth Modal Listeners
-            // Listener for authToggleButton is added dynamically in onAuthStateChanged
-            const closeAuthModal = document.getElementById('closeAuthModal');
-            if(closeAuthModal) closeAuthModal.addEventListener('click', () => {
-                document.getElementById('authModal').style.display = 'none';
+            // Trigger reflow to enable animation
+            requestAnimationFrame(() => {
+                 requestAnimationFrame(() => {
+                     toast.classList.add('show');
+                 });
             });
 
-            // Toggle Sign In / Create Account
-            let isSignInMode = true;
+
+            setTimeout(() => {
+                toast.classList.remove('show');
+                setTimeout(() => toast.remove(), 300); // Remove after fade out
+            }, 4000);
+        }
+        window.showToast = showToast; // Make globally accessible
+
+        // --- Database Path Helpers ---
+        function getProductsDocRef(dbInstance, userIdToUse) {
+            return doc(dbInstance, 'artifacts', appId, 'users', userIdToUse, 'config', 'products');
+        }
+        function getCartDocRef(dbInstance, userIdToUse) {
+            return doc(dbInstance, 'artifacts', appId, 'users', userIdToUse, 'config', 'cart');
+        }
+        function getOrdersCollectionRef(dbInstance) {
+            return collection(dbInstance, 'artifacts', appId, 'public', 'data', 'orders');
+        }
+
+        // --- Retry Logic for Async Operations ---
+        async function fetchWithRetry(asyncFn, retries = 3, delay = 500) {
+            for (let i = 0; i < retries; i++) {
+                try {
+                    return await asyncFn();
+                } catch (error) {
+                    if (i === retries - 1) throw error; // Rethrow last error
+                    console.warn(`Operation failed (attempt ${i + 1}). Retrying in ${delay}ms...`, error);
+                    await new Promise(resolve => setTimeout(resolve, delay));
+                    delay *= 2; // Exponential backoff
+                }
+            }
+        }
+
+        // --- Database Operations ---
+         async function initializeProducts(dbInstance, userIdToUse) {
+             console.log("Initializing products for user:", userIdToUse);
+             if (!dbInstance || !userIdToUse) {
+                 console.error("DB or UserID missing for product initialization.");
+                 showToast('toastProductLoadError', 'error');
+                 return []; // Return empty on fundamental error
+             }
+             const productsDocRef = getProductsDocRef(dbInstance, userIdToUse);
+             try {
+                 const docSnap = await getDoc(productsDocRef);
+                 if (!docSnap.exists() || !docSnap.data().products || docSnap.data().products.length === 0) {
+                     console.log("No products found in DB. Setting default products.");
+                     const data = { products: defaultProducts, lastUpdated: new Date() };
+                     await setDoc(productsDocRef, data);
+                     return defaultProducts;
+                 } else {
+                     console.log("Products loaded from DB.");
+                     return docSnap.data().products;
+                 }
+             } catch (error) {
+                 console.error("Error fetching/initializing products:", error);
+                 showToast('toastProductLoadError', 'error');
+                 const errorIndicator = document.getElementById('errorIndicator');
+                 if(errorIndicator) {
+                     errorIndicator.textContent = `${getTranslation('toastProductLoadError')}: ${error.message}`;
+                     errorIndicator.classList.remove('hidden');
+                 }
+                 document.getElementById('loadingIndicator')?.classList.add('hidden');
+                 return []; // Return empty on error
+             }
+         }
+
+         async function saveCartToDB(currentCart) {
+             if (!db || !userId || auth?.currentUser?.isAnonymous) return;
+             const cartDocRef = getCartDocRef(db, userId);
+             const data = { cart: currentCart, lastUpdated: new Date() };
+             try {
+                 await setDoc(cartDocRef, data);
+                 console.log("Cart saved to DB for user:", userId);
+             } catch (error) {
+                 console.error("Error saving cart to DB:", error);
+                 // showToast('toastCartSaveError', 'error'); // Optional: Add translation key
+             }
+         }
+
+        async function saveOrderToDB(orderData) {
+            if (!db) {
+                console.error("Firestore not initialized. Cannot save order.");
+                throw new Error("Database not ready.");
+            }
+             const ordersColRef = getOrdersCollectionRef(db);
+             try {
+                 // Ensure userId is valid before saving
+                 if (!userId || auth?.currentUser?.isAnonymous) {
+                     throw new Error("User must be signed in to place an order.");
+                 }
+                 await addDoc(ordersColRef, {
+                     ...orderData,
+                     userId: userId, // Associate order with the SIGNED IN user
+                     timestamp: new Date(),
+                     status: 'Processing' // Initial status
+                 });
+                 console.log("Order saved successfully to public collection.");
+             } catch (error) {
+                 console.error("Error saving order:", error);
+                 throw error; // Re-throw to handle in UI
+             }
+         }
+
+         async function loadCartFromDB(userIdToLoad) {
+            if (!db || !userIdToLoad) return {};
+            const cartDocRef = getCartDocRef(db, userIdToLoad);
+            try {
+                const docSnap = await getDoc(cartDocRef);
+                if (docSnap.exists()) {
+                    console.log("Cart loaded from DB for user:", userIdToLoad);
+                    return docSnap.data().cart || {};
+                }
+            } catch (error) {
+                console.error("Error loading cart from DB:", error);
+                 showToast('toastCartLoadError', 'error');
+            }
+            return {};
+        }
+
+        // --- UI Rendering ---
+        function renderProducts(currentProducts) {
+             products = currentProducts; // Update global products array
+             const grid = document.getElementById('productGrid');
+             const loadingIndicator = document.getElementById('loadingIndicator');
+             const errorIndicator = document.getElementById('errorIndicator');
+
+             if (!grid) { console.error("Product grid element not found"); return; }
+             grid.innerHTML = ''; // Clear previous items
+
+             if (!products || products.length === 0) {
+                 if (loadingIndicator && !loadingIndicator.classList.contains('hidden')) {
+                     loadingIndicator.classList.add('hidden'); // Hide loading if no products found after load attempt
+                 }
+                 if (errorIndicator && errorIndicator.classList.contains('hidden')) { // Avoid showing error if already shown by init
+                    grid.innerHTML = `<p class="text-gray-500 col-span-full text-center py-10" data-translate="noProducts">${getTranslation('noProducts')}</p>`;
+                 }
+                 return;
+             }
+
+             if (loadingIndicator) loadingIndicator.classList.add('hidden');
+             if (errorIndicator) errorIndicator.classList.add('hidden');
+
+             products.forEach(product => {
+                 const card = document.createElement('div');
+                 card.className = 'product-card bg-white rounded-xl overflow-hidden shadow-lg border border-gray-100 flex flex-col'; // Use flex column
+
+                 // --- Image Carousel Structure ---
+                 const imageContainer = document.createElement('div');
+                 imageContainer.className = 'image-container h-48 w-full relative';
+                 imageContainer.setAttribute('data-product-id', product.id);
+                 imageContainer.setAttribute('data-current-index', '0');
+
+                 (product.images || [/* Default image URL */]).forEach((imgUrl, index) => {
+                     const img = document.createElement('img');
+                     img.src = imgUrl || 'https://placehold.co/300x200/cccccc/ffffff?text=Image+Missing';
+                     img.alt = `${product.name} image ${index + 1}`;
+                     img.className = `product-image absolute top-0 left-0 w-full h-full object-cover transition-opacity duration-300 ${index === 0 ? 'opacity-100 z-10' : 'opacity-0 z-0'}`;
+                     img.setAttribute('data-index', index);
+                     img.onerror = () => { img.src = 'https://placehold.co/300x200/cccccc/ffffff?text=Image+Error'; };
+                     imageContainer.appendChild(img);
+                 });
+
+                 if ((product.images?.length || 0) > 1) {
+                     const prevBtn = document.createElement('button');
+                     prevBtn.innerHTML = '&#10094;'; // Left arrow
+                     prevBtn.className = 'carousel-btn prev p-2 bg-black bg-opacity-40 text-white rounded-full absolute top-1/2 left-2 transform -translate-y-1/2 z-20 hover:bg-opacity-60';
+                     prevBtn.onclick = () => changeProductImage(product.id, -1);
+                     imageContainer.appendChild(prevBtn);
+
+                     const nextBtn = document.createElement('button');
+                     nextBtn.innerHTML = '&#10095;'; // Right arrow
+                     nextBtn.className = 'carousel-btn next p-2 bg-black bg-opacity-40 text-white rounded-full absolute top-1/2 right-2 transform -translate-y-1/2 z-20 hover:bg-opacity-60';
+                     nextBtn.onclick = () => changeProductImage(product.id, 1);
+                     imageContainer.appendChild(nextBtn);
+                 }
+                 card.appendChild(imageContainer);
+
+                 // --- Product Details ---
+                 const detailsDiv = document.createElement('div');
+                 detailsDiv.className = 'p-4 flex flex-col flex-grow';
+
+                 const titleColor = product.titleColor || 'bg-gray-200 text-gray-800';
+                 detailsDiv.innerHTML = `
+                     <div class="mb-3">
+                         <h3 class="text-xl font-bold ${titleColor.split(' ')[1]}">${getTranslation(product.descriptionKey) || product.name}</h3>
+                     </div>
+                     <div class="space-y-3 flex-grow">
+                         ${(product.sizes || []).map((sizeOption, index) => {
+                             const cartId = `${product.id}-${index}`;
+                             const currentQty = cart[cartId] ? cart[cartId].quantity : 0;
+                             return `
+                                 <div class="flex justify-between items-center py-2 border-t border-gray-100">
+                                     <div class="flex flex-col">
+                                         <span class="text-lg font-bold text-green-600">₹${sizeOption.price.toFixed(2)}</span>
+                                         <span class="text-sm text-gray-500">${sizeOption.size}</span>
+                                     </div>
+                                     <div class="flex items-center space-x-1">
+                                         <button onclick="window.updateCart('${cartId}', -1)" class="qty-button bg-orange-100 text-orange-600 rounded-full hover:bg-orange-200">-</button>
+                                         <span id="qty-${cartId}" class="w-8 text-center font-bold text-gray-700">${currentQty}</span>
+                                         <button onclick="window.updateCart('${cartId}', 1)" class="qty-button bg-green-100 text-green-600 rounded-full hover:bg-green-200">+</button>
+                                     </div>
+                                 </div>
+                             `;
+                         }).join('')}
+                     </div>
+                 `;
+                 card.appendChild(detailsDiv);
+                 grid.appendChild(card);
+             });
+             calculateCart(); // Update cart footer
+         }
+
+        // --- Cart Logic ---
+         window.updateCart = function(cartId, change) {
+             if (!products.length) return; // Products not loaded yet
+
+             const [productId, sizeIndexStr] = cartId.split('-');
+             const sizeIndex = parseInt(sizeIndexStr);
+             const product = products.find(p => p.id === productId);
+             if (!product || !product.sizes || !product.sizes[sizeIndex]) {
+                 console.error("Product or size not found for cartId:", cartId);
+                 return;
+             }
+             const sizeOption = product.sizes[sizeIndex];
+
+             if (!cart[cartId]) {
+                 cart[cartId] = { productId, productName: product.name, size: sizeOption.size, price: sizeOption.price, quantity: 0 };
+             }
+
+             const newQty = Math.max(0, cart[cartId].quantity + change);
+
+             if (newQty > 0) {
+                 cart[cartId].quantity = newQty;
+             } else {
+                 delete cart[cartId]; // Remove if zero
+             }
+
+             const qtyElement = document.getElementById(`qty-${cartId}`);
+             if (qtyElement) qtyElement.textContent = newQty;
+
+             calculateCart(); // Recalculate and update UI/DB
+         }
+
+         function calculateCart() {
+             let totalItems = 0;
+             let totalAmount = 0;
+             Object.values(cart).forEach(item => {
+                 totalItems += item.quantity;
+                 totalAmount += item.quantity * item.price;
+             });
+
+             const itemCountEl = document.getElementById('cart-item-count');
+             const totalEl = document.getElementById('cart-total');
+             const proceedButton = document.getElementById('proceedToOrderButton');
+
+             if (itemCountEl) itemCountEl.textContent = totalItems;
+             if (totalEl) totalEl.textContent = `₹${totalAmount.toFixed(2)}`;
+
+             if (proceedButton) {
+                 // Enable button only if items > 0 AND user is NOT anonymous
+                 const userIsReal = auth?.currentUser && !auth.currentUser.isAnonymous;
+                 proceedButton.disabled = !(totalItems > 0 && userIsReal);
+                 // Update text based on disabled state if needed, or use CSS classes
+                 if (proceedButton.disabled && totalItems > 0 && !userIsReal) {
+                     proceedButton.title = getTranslation('toastSignInRequired'); // Tooltip
+                 } else {
+                      proceedButton.title = '';
+                 }
+             }
+
+             // Debounced save to DB for logged-in users
+             clearTimeout(window.saveCartTimeout);
+             window.saveCartTimeout = setTimeout(() => saveCartToDB(cart), 1500); // Increased delay slightly
+         }
+         window.calculateCart = calculateCart; // Make global
+
+        // --- Image Carousel Logic ---
+         function changeProductImage(productId, direction) {
+             const container = document.querySelector(`.image-container[data-product-id="${productId}"]`);
+             if (!container) return;
+             const images = container.querySelectorAll('.product-image');
+             if (images.length <= 1) return;
+
+             let currentIndex = parseInt(container.getAttribute('data-current-index') || '0');
+             let nextIndex = (currentIndex + direction + images.length) % images.length;
+
+             images[currentIndex].classList.remove('opacity-100', 'z-10');
+             images[currentIndex].classList.add('opacity-0', 'z-0');
+             images[nextIndex].classList.remove('opacity-0', 'z-0');
+             images[nextIndex].classList.add('opacity-100', 'z-10');
+
+             container.setAttribute('data-current-index', nextIndex);
+         }
+         window.changeProductImage = changeProductImage;
+
+         // --- View Switching Logic ---
+         const viewBackgroundClasses = { /* ... (same as before) ... */ };
+         viewBackgroundClasses['products-view'] = 'bg-products';
+         viewBackgroundClasses['tracking-view'] = 'bg-tracking';
+         viewBackgroundClasses['about-view'] = 'bg-about';
+         viewBackgroundClasses['contact-view'] = 'bg-contact';
+
+         function showView(viewId) {
+             document.querySelectorAll('.view-content').forEach(view => view.classList.add('hidden'));
+             document.querySelectorAll('nav a').forEach(link => {
+                 link.classList.remove('border-green-700', 'text-green-700');
+                 link.classList.add('text-gray-500', 'border-transparent');
+             });
+
+             const selectedView = document.getElementById(viewId);
+             if (selectedView) selectedView.classList.remove('hidden');
+
+             const navLink = document.getElementById(`nav-${viewId.replace('-view', '')}`);
+             if (navLink) {
+                 navLink.classList.remove('text-gray-500', 'border-transparent');
+                 navLink.classList.add('text-green-700', 'border-green-700');
+             }
+
+             // Apply Background
+             const pageContent = document.getElementById('page-content');
+             Object.values(viewBackgroundClasses).forEach(cls => pageContent.classList.remove(cls));
+             if (viewBackgroundClasses[viewId]) {
+                 pageContent.classList.add(viewBackgroundClasses[viewId]);
+             }
+         }
+         window.showView = showView; // Make global
+
+         // --- Order Tracking Logic ---
+         const TRACKING_STEPS_EN = [ /* ... (same as before) ... */ ];
+         TRACKING_STEPS_EN.push(
+            { id: 'step-processing', titleKey: 'stepProcessingTitle', detailKey: 'stepProcessingDetail' },
+            { id: 'step-shipped', titleKey: 'stepShippedTitle', detailKey: 'stepShippedDetail' },
+            { id: 'step-transit', titleKey: 'stepTransitTitle', detailKey: 'stepTransitDetail' },
+            { id: 'step-delivered', titleKey: 'stepDeliveredTitle', detailKey: 'stepDeliveredDetail' }
+        );
+
+         function simulateTracking(overrideOrderId) {
+            // ... (tracking logic, using getTranslation) ...
+            const orderIdInput = document.getElementById('order-id-input');
+            const orderId = overrideOrderId || orderIdInput?.value.toUpperCase().trim() || "";
+            const trackingContainer = document.getElementById('tracking-status-container');
+            const initialPrompt = document.getElementById('tracking-initial-prompt');
+            const displayOrderId = document.getElementById('display-order-id');
+            const deliveryTimeline = document.getElementById('delivery-timeline');
+
+            if (!trackingContainer || !initialPrompt || !displayOrderId || !deliveryTimeline) return; // Elements not ready
+
+            let simulatedStatusIndex = -1;
+            let hash = 0;
+            for (let i = 0; i < orderId.length; i++) { hash = (hash << 5) - hash + orderId.charCodeAt(i); hash |= 0; }
+            simulatedStatusIndex = Math.abs(hash) % TRACKING_STEPS_EN.length;
+
+            if (orderId === "") {
+                if(!overrideOrderId) showToast('toastEnterOrderId', 'error');
+                return;
+            }
+
+            initialPrompt.classList.add('hidden');
+            trackingContainer.classList.remove('hidden');
+            displayOrderId.innerText = orderId;
+            deliveryTimeline.innerHTML = ''; // Clear
+
+            deliveryTimeline.innerHTML = TRACKING_STEPS_EN.map((step, index) => `
+                <div id="${step.id}-${orderId}" class="timeline-item ${index <= simulatedStatusIndex ? 'active' : ''}">
+                    <div class="timeline-bullet"></div>
+                    <p class="font-semibold text-gray-700">${getTranslation(step.titleKey)}</p>
+                    <p class="text-sm text-gray-500">${getTranslation(step.detailKey)}</p>
+                </div>
+            `).join('');
+
+            if (!overrideOrderId) {
+                showToast('toastTrackingStatusFound', 'success');
+            }
+         }
+         window.simulateTracking = simulateTracking; // Make global
+
+         // --- Modal Handling ---
+         const authModal = document.getElementById('authModal');
+         const orderModal = document.getElementById('orderModal');
+         window.openAuthModal = () => { if(authModal) authModal.style.display = 'flex'; }
+         window.closeAuthModal = () => { if(authModal) authModal.style.display = 'none'; }
+         window.openOrderModal = () => {
+             // Reset to step 1
+             const form = document.getElementById('deliveryForm');
+             const paymentDiv = document.getElementById('paymentDetails');
+             const title = document.getElementById('orderModalTitle');
+             if(form) form.classList.remove('hidden');
+             if(paymentDiv) paymentDiv.classList.add('hidden');
+             if(title) title.textContent = getTranslation('deliveryDetailsTitle');
+             if(orderModal) orderModal.style.display = 'flex';
+         }
+         window.closeOrderModal = () => { if(orderModal) orderModal.style.display = 'none'; }
+
+         // Close modal if clicked outside content
+         authModal?.addEventListener('click', (e) => { if (e.target === authModal) closeAuthModal(); });
+         orderModal?.addEventListener('click', (e) => { if (e.target === orderModal) closeOrderModal(); });
+
+
+        // --- Authentication Logic ---
+        function setupAuthListeners() {
+            const authToggleButton = document.getElementById('authToggleButton');
             const authForm = document.getElementById('authForm');
             const authSubmitButton = document.getElementById('authSubmitButton');
             const toggleAuthModeButton = document.getElementById('toggleAuthMode');
+            const authMessageEl = document.getElementById('authMessage');
+            const closeAuthModalButton = document.getElementById('closeAuthModal');
 
-            if(toggleAuthModeButton) toggleAuthModeButton.addEventListener('click', (e) => {
+             if (!authToggleButton || !authForm || !authSubmitButton || !toggleAuthModeButton || !authMessageEl || !closeAuthModalButton) {
+                 console.error("Auth modal elements not found!");
+                 return;
+             }
+
+             // Initial button state set in onAuthStateChanged
+             authToggleButton.onclick = openAuthModal; // Default is Sign In
+
+             toggleAuthModeButton.addEventListener('click', (e) => {
                 e.preventDefault();
                 isSignInMode = !isSignInMode;
-                if (isSignInMode) {
-                    authSubmitButton.textContent = 'Sign In';
-                    toggleAuthModeButton.textContent = 'New Customer? Create Account';
-                } else {
-                    authSubmitButton.textContent = 'Create Account';
-                    toggleAuthModeButton.textContent = 'Already a Customer? Sign In';
-                }
-                document.getElementById('authMessage').textContent = '';
+                authSubmitButton.textContent = getTranslation(isSignInMode ? 'signIn' : 'createAccount'); // Use new key
+                toggleAuthModeButton.textContent = getTranslation(isSignInMode ? 'createAccountLink' : 'loginLink');
+                document.querySelector('#authModal h3').textContent = getTranslation('signInRegisterTitle');
+                authMessageEl.textContent = '';
             });
 
-            if(authForm) authForm.addEventListener('submit', async (e) => {
+             closeAuthModalButton.addEventListener('click', closeAuthModal);
+
+             authForm.addEventListener('submit', async (e) => {
                 e.preventDefault();
                 const email = document.getElementById('authEmail').value;
                 const password = document.getElementById('authPassword').value;
-                const messageEl = document.getElementById('authMessage');
-                messageEl.textContent = 'Processing...';
+                authMessageEl.textContent = 'Processing...';
+
+                 if (!auth) {
+                     authMessageEl.textContent = "Auth service not ready.";
+                     return;
+                 }
 
                 try {
                     if (isSignInMode) {
@@ -453,233 +930,273 @@
                     } else {
                         await createUserWithEmailAndPassword(auth, email, password);
                     }
-                    document.getElementById('authModal').style.display = 'none';
+                    authMessageEl.textContent = '';
+                    closeAuthModal();
+                    // --- Auto-proceed to checkout if triggered during order ---
+                    if (window.pendingCheckoutAction) {
+                         openOrderModal();
+                         window.pendingCheckoutAction = false; // Reset flag
+                    }
                 } catch (error) {
                     let errorMessage = 'An unknown error occurred.';
                     if (error.code) {
                         errorMessage = error.message.replace('Firebase: ', '').replace(/\(.*\)/, '').trim();
                     }
-                    messageEl.textContent = errorMessage;
+                    authMessageEl.textContent = `${getTranslation('toastAuthError')} ${errorMessage}`;
                     console.error("Auth Error:", error);
-                }
-            });
-
-            // Order Modal Listeners
-            const proceedToOrderButton = document.getElementById('proceedToOrderButton');
-            if(proceedToOrderButton) proceedToOrderButton.addEventListener('click', () => {
-                if (!userId || auth?.currentUser?.isAnonymous) {
-                     showMessageModal("Sign In Required", 'Please sign in or create an account before placing an order.');
-                     return;
-                }
-                // Reset to step 1
-                document.getElementById('orderModalTitle').textContent = '1. Delivery Details';
-                document.getElementById('deliveryForm').classList.remove('hidden');
-                document.getElementById('paymentDetails').classList.add('hidden');
-                document.getElementById('orderModal').style.display = 'block';
-            });
-
-            document.getElementById('cancelOrder')?.addEventListener('click', () => {
-                document.getElementById('orderModal').style.display = 'none';
-            });
-
-            document.getElementById('backToDelivery')?.addEventListener('click', () => {
-                document.getElementById('orderModalTitle').textContent = '1. Delivery Details';
-                document.getElementById('deliveryForm').classList.remove('hidden');
-                document.getElementById('paymentDetails').classList.add('hidden');
-            });
-
-            // Handle Delivery Form Submission (Step 1 -> 2)
-            document.getElementById('deliveryForm')?.addEventListener('submit', (e) => {
-                e.preventDefault();
-
-                // Build order summary for step 2
-                const summaryList = document.getElementById('orderSummaryList');
-                summaryList.innerHTML = '';
-                let totalAmount = 0;
-
-                for (const cartId in cart) {
-                    const item = cart[cartId];
-                    if (item.quantity > 0) {
-                        const listItem = document.createElement('li');
-                        listItem.textContent = `${item.quantity} x ${item.productName} (${item.size}) @ ₹${item.price.toFixed(2)} = ₹${(item.quantity * item.price).toFixed(2)}`;
-                        summaryList.appendChild(listItem);
-                        totalAmount += item.quantity * item.price;
-                    }
-                }
-
-                document.getElementById('paymentTotal').textContent = `₹${totalAmount.toFixed(2)}`;
-
-                // Switch to payment view
-                document.getElementById('orderModalTitle').textContent = '2. Confirm Order & Payment';
-                document.getElementById('deliveryForm').classList.add('hidden');
-                document.getElementById('paymentDetails').classList.remove('hidden');
-            });
-
-            // Handle Place Order Button (Step 2 -> Final)
-            document.getElementById('placeOrderButton')?.addEventListener('click', async () => {
-                const orderData = {
-                    customerName: document.getElementById('deliveryName').value,
-                    mobile: document.getElementById('deliveryMobile').value,
-                    address: document.getElementById('deliveryAddress').value,
-                    items: Object.values(cart).filter(item => item.quantity > 0),
-                    total: parseFloat(document.getElementById('paymentTotal').textContent.replace('₹', '')),
-                    paymentMethod: document.querySelector('input[name="paymentOption"]:checked').value,
-                    status: 'Pending'
-                };
-
-                try {
-                    document.getElementById('placeOrderButton').textContent = 'Placing Order...';
-                    document.getElementById('placeOrderButton').disabled = true;
-
-                    await saveOrderToDB(orderData);
-
-                    // Clear cart after successful order
-                    cart = {};
-                    calculateCart();
-                    renderProducts(products); // Re-render to show 0 quantity
-
-                    // Show success message
-                    showMessageModal("Success", `Order placed successfully! Total: ₹${orderData.total.toFixed(2)}. We will contact you shortly on WhatsApp.`);
-                    document.getElementById('orderModal').style.display = 'none';
-
-                } catch (error) {
-                    console.error("Error placing order:", error);
-                    showMessageModal("Error", "There was an error placing your order. Please try again.");
-                } finally {
-                    document.getElementById('placeOrderButton').textContent = 'Place Final Order';
-                    document.getElementById('placeOrderButton').disabled = false;
                 }
             });
         }
 
+        // --- Order Placement Logic ---
+        function setupOrderListeners() {
+            const proceedButton = document.getElementById('proceedToOrderButton');
+            const deliveryForm = document.getElementById('deliveryForm');
+            const placeOrderButton = document.getElementById('placeOrderButton');
+            const cancelOrderButton = document.getElementById('cancelOrder');
+            const backToDeliveryButton = document.getElementById('backToDelivery');
 
-        // --- Firebase Initialization and Auth Logic (FIXED) ---
+             if (!proceedButton || !deliveryForm || !placeOrderButton || !cancelOrderButton || !backToDeliveryButton) {
+                 console.error("Order modal elements not found!");
+                 return;
+             }
 
-        async function initFirebase() {
+             proceedButton.addEventListener('click', () => {
+                 if (!auth?.currentUser || auth.currentUser.isAnonymous) {
+                     showToast('toastSignInRequired', 'error');
+                     window.pendingCheckoutAction = true; // Set flag to proceed after login
+                     openAuthModal(); // Prompt user to sign in
+                 } else if (Object.keys(cart).length > 0) {
+                     openOrderModal(); // Open if signed in and cart has items
+                 } else {
+                     showToast('toastCartEmpty', 'error');
+                 }
+             });
+
+             deliveryForm.addEventListener('submit', (e) => {
+                 e.preventDefault();
+                 // Show payment details / summary
+                 const summaryList = document.getElementById('orderSummaryList');
+                 summaryList.innerHTML = '';
+                 let totalAmount = 0;
+                 Object.values(cart).forEach(item => {
+                     if (item.quantity > 0) {
+                         const li = document.createElement('li');
+                         li.textContent = `${item.quantity} x ${item.productName} (${item.size}) @ ₹${item.price.toFixed(2)} = ₹${(item.quantity * item.price).toFixed(2)}`;
+                         summaryList.appendChild(li);
+                         totalAmount += item.quantity * item.price;
+                     }
+                 });
+                 document.getElementById('paymentTotal').textContent = `₹${totalAmount.toFixed(2)}`;
+
+                 // Switch view
+                 deliveryForm.classList.add('hidden');
+                 document.getElementById('paymentDetails').classList.remove('hidden');
+                 document.getElementById('orderModalTitle').textContent = getTranslation('paymentConfirmationTitle');
+             });
+
+             backToDeliveryButton.addEventListener('click', () => {
+                 deliveryForm.classList.remove('hidden');
+                 document.getElementById('paymentDetails').classList.add('hidden');
+                 document.getElementById('orderModalTitle').textContent = getTranslation('deliveryDetailsTitle');
+             });
+
+             cancelOrderButton.addEventListener('click', closeOrderModal);
+
+             placeOrderButton.addEventListener('click', async () => {
+                 if (!userId || auth?.currentUser?.isAnonymous) {
+                     showToast('toastSignInRequired', 'error'); // Should not happen due to proceed check, but good failsafe
+                     return;
+                 }
+                 const orderData = {
+                     customerName: document.getElementById('deliveryName').value,
+                     mobile: document.getElementById('deliveryMobile').value,
+                     address: document.getElementById('deliveryAddress').value,
+                     items: Object.values(cart).filter(item => item.quantity > 0),
+                     total: parseFloat(document.getElementById('paymentTotal').textContent.replace('₹', '')),
+                     paymentMethod: document.querySelector('input[name="paymentOption"]:checked').value,
+                 };
+
+                 placeOrderButton.textContent = 'Placing Order...';
+                 placeOrderButton.disabled = true;
+
+                 try {
+                     await saveOrderToDB(orderData);
+                     cart = {}; // Clear local cart
+                     await saveCartToDB({}); // Clear cart in DB
+                     calculateCart(); // Update footer
+                     renderProducts(products); // Re-render product quantities
+                     showToast('toastOrderSuccess', 'success');
+                     closeOrderModal();
+                 } catch (error) {
+                     showToast('toastOrderError', 'error');
+                 } finally {
+                     placeOrderButton.textContent = getTranslation('placeOrderButton');
+                     placeOrderButton.disabled = false;
+                 }
+             });
+        }
+
+
+        // --- Initialization ---
+        async function initializeApp() {
             const loadingIndicator = document.getElementById('loadingIndicator');
+            const errorIndicator = document.getElementById('errorIndicator');
+            const authStatusEl = document.getElementById('authStatus');
+            let authToggleButton = document.getElementById('authToggleButton'); // Use let for re-assignment
 
             try {
-                // Robust check for Firebase config
                 if (!firebaseConfig || Object.keys(firebaseConfig).length === 0) {
                     throw new Error("Firebase configuration is missing or empty.");
                 }
 
                 app = initializeApp(firebaseConfig);
-                db = getFirestore(app);
                 auth = getAuth(app);
+                db = getFirestore(app);
 
-                // Initial authentication attempt (runs only once on load)
-                if (initialAuthToken && initialAuthToken.length > 0) {
-                    await signInWithCustomToken(auth, initialAuthToken);
-                } else {
-                    await signInAnonymously(auth);
-                }
+                try { await enableIndexedDbPersistence(db); } catch (err) { /* Handle persistence errors */ }
 
-                // Set up all static event listeners
-                setupListeners();
-                
-                // Auth State Listener: This is the core logic that runs every time the user signs in or out.
+                // Setup listeners *after* elements are potentially available
+                setupAuthListeners();
+                setupOrderListeners();
+
+                // Authentication Logic (Crucial Part)
                 onAuthStateChanged(auth, async (user) => {
-                    isAuthReady = true;
-                    const statusEl = document.getElementById('authStatus');
-                    let toggleBtn = document.getElementById('authToggleButton');
+                    authStateInitialized = true;
+                    authStatusEl.textContent = 'Status: Updating...'; // Initial state while checking
 
-                    // FIX: Cloning the button to safely remove old listeners.
-                    const newToggleBtn = toggleBtn.cloneNode(true);
-                    toggleBtn.parentNode.replaceChild(newToggleBtn, toggleBtn);
-                    toggleBtn = newToggleBtn; 
+                    if (cartListenerUnsubscribe) { cartListenerUnsubscribe(); cartListenerUnsubscribe = null; }
 
                     if (user) {
                         userId = user.uid;
                         const isAnon = user.isAnonymous;
+                        console.log(`Auth state: Signed In. User ID: ${userId}, Anonymous: ${isAnon}`);
 
-                        console.log(`User state changed. User ID: ${userId}, Anonymous: ${isAnon}`);
+                        authStatusEl.textContent = isAnon ? 'Status: Guest' : `Status: Signed In`;
+                        authToggleButton.textContent = getTranslation('signOut');
+                        authToggleButton.className = 'px-4 py-2 bg-red-500 text-white font-semibold rounded-lg shadow-md hover:bg-red-600 transition duration-150';
 
-                        // 1. Update UI to Signed In/Guest
-                        statusEl.innerHTML = isAnon ? 'Status: Guest' : `User ID: <span class="font-mono text-xs">${userId}</span>`;
-                        toggleBtn.textContent = 'Sign Out';
-                        toggleBtn.classList.remove('bg-[#38A169]');
-                        toggleBtn.classList.add('bg-red-500', 'hover:bg-red-600');
+                        // IMPORTANT: Re-attach Sign Out listener using a clone to avoid duplicate listeners
+                        const newBtn = authToggleButton.cloneNode(true);
+                        authToggleButton.parentNode.replaceChild(newBtn, authToggleButton);
+                        authToggleButton = newBtn; // Update reference
+                        authToggleButton.onclick = async () => { try { await signOut(auth); } catch (e) { console.error("Sign Out Error:", e); showToast('toastAuthError', 'error'); } };
 
-
-                        // Attach Sign Out listener
-                        toggleBtn.addEventListener('click', async () => {
+                        // Load/Initialize Products (Only if needed or first time for user)
+                         if (products.length === 0) { // Only load if not already loaded
+                            if (loadingIndicator) loadingIndicator.textContent = 'Fetching products...';
                             try {
-                                await signOut(auth);
-                            } catch (error) {
-                                console.error("Sign Out Error:", error);
-                            }
-                        });
+                                products = await fetchWithRetry(() => initializeProducts(db, userId));
+                            } catch(error) { /* Handled in function */ }
+                         }
 
-                        // 2. Load/Initialize Products
-                        if (loadingIndicator) loadingIndicator.textContent = 'Fetching products...';
-                        try {
-                            const fetchedProducts = await fetchWithRetry(() => initializeProducts(db, userId));
-                            products = fetchedProducts;
-                        } catch (error) {
-                            console.error("Failed to fetch/initialize products:", error);
-                        }
-
-                        // 3. Load Cart (if authenticated)
+                        // Load Cart for non-anonymous user
                         if (!isAnon) {
-                            try {
-                                const cartDocRef = getCartDocRef(db, userId);
-                                // Set up the real-time listener for the cart
-                                onSnapshot(cartDocRef, (docSnap) => {
-                                    const newCart = docSnap.data()?.cart || {};
-                                    // Update only if content changed
-                                    if (JSON.stringify(cart) !== JSON.stringify(newCart)) {
-                                        cart = newCart;
-                                        calculateCart();
-                                        renderProducts(products);
-                                    }
-                                }, (error) => {
-                                    console.error("Error setting up cart listener:", error);
-                                });
-                            } catch (error) {
-                                console.error("Failed to set up cart listener (initial):", error);
-                            }
+                            cart = await loadCartFromDB(userId);
+                            const cartDocRef = getCartDocRef(db, userId);
+                            cartListenerUnsubscribe = onSnapshot(cartDocRef, (docSnap) => {
+                                const updatedCart = docSnap.data()?.cart || {};
+                                if (JSON.stringify(cart) !== JSON.stringify(updatedCart)) {
+                                    cart = updatedCart;
+                                    calculateCart();
+                                    renderProducts(products); // Re-render quantities
+                                    console.log("Real-time cart update.");
+                                }
+                            }, (error) => { console.error("Cart snapshot error:", error); showToast('toastCartLoadError', 'error'); });
+                        } else {
+                            cart = {}; // Reset cart for new anonymous session
                         }
 
-                        // Initial render and cart update
-                        renderProducts(products);
-                        calculateCart(); 
-
-                    } else {
-                        // Signed Out State
+                    } else { // User is signed out
                         userId = null;
                         cart = {};
-                        products = defaultProducts; // Show default products even if signed out, but cart ops are limited.
+                        products = defaultProducts; // Reset to default
+                        console.log("Auth state: Signed Out.");
 
-                        // 1. Update UI to Signed Out/Guest
-                        statusEl.textContent = 'Status: Guest';
-                        toggleBtn.textContent = 'Sign In';
-                        toggleBtn.classList.remove('bg-red-500', 'hover:bg-red-600');
-                        toggleBtn.classList.add('bg-[#38A169]');
+                        authStatusEl.textContent = 'Status: Guest';
+                        authToggleButton.textContent = getTranslation('signIn');
+                        authToggleButton.className = 'px-4 py-2 bg-[#38A169] text-white font-semibold rounded-lg shadow-md hover:bg-green-700 transition duration-150';
 
-                        // Attach Sign In listener (to open modal)
-                        toggleBtn.addEventListener('click', () => {
-                            document.getElementById('authMessage').textContent = '';
-                            document.getElementById('authModal').style.display = 'block';
-                        });
+                         // IMPORTANT: Re-attach Sign In listener using a clone
+                         const newBtn = authToggleButton.cloneNode(true);
+                         authToggleButton.parentNode.replaceChild(newBtn, authToggleButton);
+                         authToggleButton = newBtn; // Update reference
+                         authToggleButton.onclick = openAuthModal;
 
-                        // 2. Clear Cart and Products UI (show defaults with 0 qty)
-                        calculateCart();
-                        renderProducts(products);
+                        // Attempt anonymous sign-in
+                        try {
+                            await signInAnonymously(auth);
+                            console.log("Signed in anonymously after sign out.");
+                        } catch (anonError) {
+                            console.error("Failed to sign in anonymously:", anonError);
+                            authStatusEl.textContent = 'Error: Auth Failed';
+                            showToast('toastAuthError', 'error'); // Show auth error
+                        }
                     }
-                });
+
+                    // Render UI after auth state is confirmed
+                    renderProducts(products);
+                    calculateCart();
+                    // Show default view
+                    showView(document.querySelector('.view-content:not(.hidden)')?.id || 'products-view');
+
+                }); // End of onAuthStateChanged
+
+                // --- Initial Sign-In Attempt (if token exists) ---
+                if (initialAuthToken) {
+                    try {
+                        await signInWithCustomToken(auth, initialAuthToken);
+                        console.log("Signed in with custom token.");
+                    } catch (tokenError) {
+                        console.error("Custom token sign-in failed, attempting anonymous.", tokenError);
+                        try { await signInAnonymously(auth); } catch (e) { /* Handle final failure */ }
+                    }
+                } else if (!auth.currentUser) { // Only sign in anonymously if no user is already present
+                    try {
+                        await signInAnonymously(auth);
+                        console.log("Signed in anonymously on initial load.");
+                    } catch (anonError) {
+                         console.error("Initial anonymous sign-in failed:", anonError);
+                         authStatusEl.textContent = 'Error: Auth Failed';
+                         showToast('toastAuthError', 'error'); // Show critical auth error
+                         if (errorIndicator) errorIndicator.classList.remove('hidden');
+                         if (loadingIndicator) loadingIndicator.classList.add('hidden');
+                    }
+                } else {
+                     console.log("User already exists, skipping initial anonymous sign-in.");
+                     // Manually trigger updates if onAuthStateChanged hasn't fired yet
+                     if (!authStateInitialized) {
+                         // This case might happen if auth state is cached by browser persistence
+                         userId = auth.currentUser.uid;
+                         products = await fetchWithRetry(() => initializeProducts(db, userId));
+                         if (!auth.currentUser.isAnonymous) {
+                             cart = await loadCartFromDB(userId);
+                         }
+                         renderProducts(products);
+                         calculateCart();
+                         showView('products-view');
+                     }
+                }
+
+                // Setup session persistence
+                await setPersistence(auth, browserSessionPersistence);
+
 
             } catch (error) {
-                console.error("CRITICAL: Firebase initialization failed. Check console for configuration errors.", error);
-                if (loadingIndicator) {
-                    loadingIndicator.innerHTML = '<span class="text-red-500 font-bold">ERROR: Application failed to load. Please check console for configuration details.</span>';
+                console.error("CRITICAL: Firebase initialization or initial sign-in failed.", error);
+                if (loadingIndicator) loadingIndicator.classList.add('hidden');
+                if (errorIndicator) {
+                     errorIndicator.textContent = `Error initializing application: ${error.message}`;
+                     errorIndicator.classList.remove('hidden');
                 }
-                isAuthReady = false;
+                document.getElementById('authStatus').textContent = 'Error: Init Failed';
             }
         }
 
-        // Start the application
-        window.onload = initFirebase;
+        // --- Run Application ---
+        document.addEventListener('DOMContentLoaded', initializeApp);
+
     </script>
 </body>
 </html>
+
