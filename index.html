@@ -7,145 +7,35 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&family=Noto+Sans:wght@400;600;700&display=swap" rel="stylesheet">
     <style>
-        body {
-            font-family: 'Noto Sans', 'Inter', sans-serif;
-            background-color: #f7fafc; /* Fallback background */
-        }
-        .product-card {
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.1);
-            transition: transform 0.2s;
-            background-color: white; /* Ensure card background is white */
-        }
-        .product-card:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -4px rgba(0, 0, 0, 0.1);
-        }
-        .modal {
-            display: none; /* Hidden by default */
-            position: fixed;
-            z-index: 1000;
-            left: 0;
-            top: 0;
-            width: 100%;
-            height: 100%;
-            overflow: auto;
-            background-color: rgba(0,0,0,0.5); /* Semi-transparent black */
-            backdrop-filter: blur(5px);
-            align-items: center; /* Center vertically */
-            justify-content: center; /* Center horizontally */
-        }
-        .modal-content {
-            background-color: #ffffff;
-            padding: 30px;
-            border-radius: 12px;
-            width: 90%;
-            max-width: 500px;
-            animation: fadeIn 0.3s;
-            max-height: 90vh; /* Limit modal height */
-            overflow-y: auto; /* Allow scrolling if content overflows */
-        }
-        @keyframes fadeIn {
-            from { opacity: 0; transform: scale(0.95); }
-            to { opacity: 1; transform: scale(1); }
-        }
-        .qty-button {
-            width: 36px;
-            height: 36px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: background-color 0.1s;
-        }
-        .qty-button:hover {
-            opacity: 0.9;
-        }
-        /* Product Grid */
-        .product-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-            gap: 24px;
-        }
-        @media (max-width: 640px) {
-            .product-grid {
-                grid-template-columns: 1fr;
-            }
-        }
-
-        /* Image Carousel */
-        .image-container {
-            position: relative;
-            overflow: hidden;
-            border-top-left-radius: 0.75rem;
-            border-top-right-radius: 0.75rem;
-            height: 180px; /* Increased height for better images */
-            background-color: #e2e8f0; /* Placeholder color */
-        }
-        .product-image {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            transition: opacity 0.3s ease-in-out;
-            position: absolute;
-            top: 0;
-            left: 0;
-            opacity: 0;
-        }
-        .product-image.active {
-            opacity: 1;
-        }
-        .carousel-btn {
-            position: absolute;
-            top: 50%;
-            transform: translateY(-50%);
-            background-color: rgba(0, 0, 0, 0.5);
-            color: white;
-            padding: 8px;
-            border-radius: 50%;
-            cursor: pointer;
-            z-index: 10;
-        }
+        body { font-family: 'Noto Sans', 'Inter', sans-serif; background-color: #f7fafc; }
+        .product-card { box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.1); transition: transform 0.2s; background-color: white; }
+        .product-card:hover { transform: translateY(-2px); box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -4px rgba(0, 0, 0, 0.1); }
+        .modal { display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; overflow: auto; background-color: rgba(0,0,0,0.5); backdrop-filter: blur(5px); align-items: center; justify-content: center; }
+        .modal-content { background-color: #ffffff; padding: 30px; border-radius: 12px; width: 90%; max-width: 500px; animation: fadeIn 0.3s; max-height: 90vh; overflow-y: auto; }
+        @keyframes fadeIn { from { opacity: 0; transform: scale(0.95); } to { opacity: 1; transform: scale(1); } }
+        .qty-button { width: 36px; height: 36px; display: flex; align-items: center; justify-content: center; transition: background-color 0.1s; }
+        .qty-button:hover { opacity: 0.9; }
+        .product-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 24px; }
+        @media (max-width: 640px) { .product-grid { grid-template-columns: 1fr; } }
+        .image-container { position: relative; overflow: hidden; border-top-left-radius: 0.75rem; border-top-right-radius: 0.75rem; height: 180px; background-color: #e2e8f0; }
+        .product-image { width: 100%; height: 100%; object-fit: cover; transition: opacity 0.3s ease-in-out; position: absolute; top: 0; left: 0; opacity: 0; }
+        .product-image.active { opacity: 1; }
+        .carousel-btn { position: absolute; top: 50%; transform: translateY(-50%); background-color: rgba(0, 0, 0, 0.5); color: white; padding: 8px; border-radius: 50%; cursor: pointer; z-index: 10; }
         .carousel-btn.prev { left: 8px; }
         .carousel-btn.next { right: 8px; }
-
-        /* Tracking Timeline */
         .timeline { position: relative; padding-left: 2rem; }
         .timeline::before { content: ''; position: absolute; left: 9px; top: 0; bottom: 0; width: 2px; background: #a7f3d0; }
         .timeline-item { position: relative; margin-bottom: 2rem; padding-left: 1.5rem; }
         .timeline-bullet { content: ''; position: absolute; left: 0; top: 0.25rem; width: 20px; height: 20px; border-radius: 50%; background: #d1d5db; border: 4px solid #f0fdf4; transition: background 0.5s ease-in-out; }
         .timeline-item.active .timeline-bullet { background: #10b981; box-shadow: 0 0 0 4px #a7f3d0; }
-
-        /* Backgrounds */
-        #page-content {
-            min-height: calc(100vh - 180px);
-            background-size: cover;
-            background-position: center center; /* Ensure center positioning */
-            background-repeat: no-repeat;
-            transition: background-image 0.5s ease-in-out;
-            position: relative;
-            padding-top: 1.5rem; /* Padding from top of background */
-        }
-        /* Overlay for Readability */
-        #page-content::before {
-            content: '';
-            position: absolute;
-            top: 0; left: 0; right: 0; bottom: 0;
-            background-color: rgba(255, 255, 255, 0.80); /* Slightly increased opacity */
-            backdrop-filter: blur(3px); /* Slightly increased blur */
-            z-index: 1;
-        }
-        #page-content > div.view-content {
-            position: relative;
-            z-index: 2;
-            padding: 1rem;
-        }
-        /* Specific Background Image Classes - REPLACE PLACEHOLDERS */
-        .bg-products { background-image: url('https://i.imgur.com/your-image-1-url.jpg'); }
-        .bg-tracking { background-image: url('https://i.imgur.com/your-image-2-url.jpg'); }
-        .bg-about { background-image: url('https://i.imgur.com/your-image-3-url.jpg'); }
-        .bg-contact { background-image: url('https://i.imgur.com/your-image-4-url.jpg'); }
+        #page-content { min-height: calc(100vh - 180px); background-size: cover; background-position: center center; background-repeat: no-repeat; transition: background-image 0.5s ease-in-out; position: relative; padding-top: 1.5rem; }
+        #page-content::before { content: ''; position: absolute; top: 0; left: 0; right: 0; bottom: 0; background-color: rgba(255, 255, 255, 0.80); backdrop-filter: blur(3px); z-index: 1; }
+        #page-content > div.view-content { position: relative; z-index: 2; padding: 1rem; }
+        .bg-products { background-image: url('https://i.imgur.com/your-image-1-url.jpg'); } /* REPLACE */
+        .bg-tracking { background-image: url('https://i.imgur.com/your-image-2-url.jpg'); } /* REPLACE */
+        .bg-about { background-image: url('https://i.imgur.com/your-image-3-url.jpg'); }   /* REPLACE */
+        .bg-contact { background-image: url('https://i.imgur.com/your-image-4-url.jpg'); } /* REPLACE */
         /* You MUST replace the placeholder URLs above with the actual URLs for your images */
-
-        /* Toast Notifications */
         #toast-container { position: fixed; top: 20px; right: 20px; z-index: 1050; display: flex; flex-direction: column; gap: 10px; }
         .toast { padding: 10px 20px; color: white; border-radius: 8px; opacity: 0; transition: opacity 0.3s, transform 0.3s; transform: translateX(100%); width: fit-content; max-width: 300px; }
         .toast.show { opacity: 1; transform: translateX(0); }
@@ -162,7 +52,7 @@
             <div class="flex items-center space-x-4">
                 <span id="authStatus" class="text-sm text-gray-600">Status: Loading...</span>
                 <button id="authToggleButton" class="px-4 py-2 bg-[#38A169] text-white font-semibold rounded-lg shadow-md hover:bg-green-700 transition duration-150" data-translate-signin="signIn" data-translate-signout="signOut">Sign In</button>
-                 <button onclick="toggleLanguage()" id="lang-toggle" class="bg-orange-600 hover:bg-orange-700 text-white text-sm font-bold py-2 px-4 rounded-lg transition duration-150 shadow-md">
+                 <button onclick="window.toggleLanguage()" id="lang-toggle" class="bg-orange-600 hover:bg-orange-700 text-white text-sm font-bold py-2 px-4 rounded-lg transition duration-150 shadow-md">
                     ಕನ್ನಡ (KN)
                 </button>
             </div>
@@ -170,10 +60,10 @@
         <!-- Navigation Tabs -->
         <nav class="bg-gray-50 border-b border-gray-200">
              <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex space-x-6 text-lg font-semibold overflow-x-auto">
-                <a href="#" onclick="showView('products-view')" id="nav-products" data-translate="navProducts" class="py-3 px-1 text-green-700 border-b-2 border-green-700 hover:text-orange-600 transition duration-150 whitespace-nowrap">Products</a>
-                <a href="#" onclick="showView('tracking-view')" id="nav-tracking" data-translate="navTrack" class="py-3 px-1 text-gray-500 border-b-2 border-transparent hover:text-orange-600 transition duration-150 whitespace-nowrap">Track Order</a>
-                <a href="#" onclick="showView('about-view')" id="nav-about" data-translate="navAbout" class="py-3 px-1 text-gray-500 border-b-2 border-transparent hover:text-orange-600 transition duration-150 whitespace-nowrap">About Us</a>
-                <a href="#" onclick="showView('contact-view')" id="nav-contact" data-translate="navContact" class="py-3 px-1 text-gray-500 border-b-2 border-transparent hover:text-orange-600 transition duration-150 whitespace-nowrap">Contact & Support</a>
+                <a href="#" onclick="window.showView('products-view')" id="nav-products" data-translate="navProducts" class="py-3 px-1 text-green-700 border-b-2 border-green-700 hover:text-orange-600 transition duration-150 whitespace-nowrap">Products</a>
+                <a href="#" onclick="window.showView('tracking-view')" id="nav-tracking" data-translate="navTrack" class="py-3 px-1 text-gray-500 border-b-2 border-transparent hover:text-orange-600 transition duration-150 whitespace-nowrap">Track Order</a>
+                <a href="#" onclick="window.showView('about-view')" id="nav-about" data-translate="navAbout" class="py-3 px-1 text-gray-500 border-b-2 border-transparent hover:text-orange-600 transition duration-150 whitespace-nowrap">About Us</a>
+                <a href="#" onclick="window.showView('contact-view')" id="nav-contact" data-translate="navContact" class="py-3 px-1 text-gray-500 border-b-2 border-transparent hover:text-orange-600 transition duration-150 whitespace-nowrap">Contact & Support</a>
             </nav>
         </nav>
     </header>
@@ -184,8 +74,8 @@
         <div id="products-view" class="view-content">
             <h2 class="text-2xl font-bold text-gray-800 mb-6 border-l-4 border-orange-500 pl-3" data-translate="seasonalStaples">Seasonal Staples</h2>
             <div id="productGrid" class="product-grid">
-                 <p id="loadingIndicator" class="text-gray-500 col-span-full text-center py-10 text-xl">Loading products...</p>
-                 <div id="errorIndicator" class="text-red-500 font-bold col-span-full text-center py-10 text-xl hidden">Error loading application. Check console for details.</div>
+                 <p id="loadingIndicator" class="text-gray-500 col-span-full text-center py-10 text-xl" data-translate="loadingProducts">Loading products...</p>
+                 <div id="errorIndicator" class="text-red-500 font-bold col-span-full text-center py-10 text-xl hidden" data-translate="errorLoadingApp">Error loading application. Check console for details.</div>
             </div>
         </div>
 
@@ -317,12 +207,33 @@
     <!-- Toast Container -->
     <div id="toast-container"></div>
 
-    <!-- Firebase SDK Imports & Main App Logic (Moved to end of body) -->
+    <!-- Firebase SDK Imports & Main App Logic (MUST BE THE ONLY ONE) -->
     <script type="module">
-        // Import necessary functions ONLY ONCE
-        import { initializeApp, deleteApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-        import { getAuth, signInAnonymously, signInWithCustomToken, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, onAuthStateChanged, setPersistence, browserSessionPersistence } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-        import { getFirestore, doc, getDoc, setDoc, onSnapshot, collection, addDoc, setLogLevel, enableIndexedDbPersistence, terminate } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+        // Import necessary functions ONLY ONCE at the top level of the module
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import {
+            getAuth,
+            signInAnonymously,
+            signInWithCustomToken,
+            createUserWithEmailAndPassword,
+            signInWithEmailAndPassword,
+            signOut,
+            onAuthStateChanged,
+            setPersistence,
+            browserSessionPersistence
+        } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import {
+            getFirestore,
+            doc,
+            getDoc,
+            setDoc,
+            onSnapshot,
+            collection,
+            addDoc,
+            setLogLevel,
+            enableIndexedDbPersistence
+            // terminate // Not typically needed unless explicitly managing shutdown
+        } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
         // --- Global Variables & Config ---
         setLogLevel('debug'); // Set log level for debugging
@@ -330,6 +241,7 @@
         const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : {};
         const initialAuthToken = typeof __initial_auth_token !== 'undefined' ? __initial_auth_token : null;
 
+        // Ensure these are declared only once at the top level
         let app, db, auth, userId = null;
         let authStateInitialized = false;
         let products = [];
@@ -337,9 +249,9 @@
         let cartListenerUnsubscribe = null;
         let isSignInMode = true; // For Auth Modal toggle
 
-        // Default products (used if Firestore is empty on first load)
+        // --- Default Products ---
         const defaultProducts = [
-             { id: 'rag-01', name: 'Ragi (Finger Millet)', descriptionKey: 'ragiDesc', titleColor: 'text-white bg-[#38A169]', basePrice: 35.00, images: ['https://placehold.co/300x200/34D399/ffffff?text=Ragi+1', 'https://placehold.co/300x200/10B981/ffffff?text=Ragi+2'], sizes: [{ size: '500 g', price: 35.00 }, { size: '1 kg', price: 70.00 }, { size: '5 kg', price: 340.00 }] },
+            { id: 'rag-01', name: 'Ragi (Finger Millet)', descriptionKey: 'ragiDesc', titleColor: 'text-white bg-[#38A169]', basePrice: 35.00, images: ['https://placehold.co/300x200/34D399/ffffff?text=Ragi+1', 'https://placehold.co/300x200/10B981/ffffff?text=Ragi+2'], sizes: [{ size: '500 g', price: 35.00 }, { size: '1 kg', price: 70.00 }, { size: '5 kg', price: 340.00 }] },
              { id: 'jow-01', name: 'Jowar (Sorghum)', descriptionKey: 'jowarDesc', titleColor: 'text-white bg-orange-500', basePrice: 25.00, images: ['https://placehold.co/300x200/F97316/ffffff?text=Jowar+1', 'https://placehold.co/300x200/EA580C/ffffff?text=Jowar+2'], sizes: [{ size: '500 g', price: 25.00 }, { size: '1 kg', price: 50.00 }, { size: '5 kg', price: 250.00 }] },
              { id: 'kob-01', name: 'Dry Coconut (Kobbari)', descriptionKey: 'kobbariDesc', titleColor: 'text-white bg-yellow-600', basePrice: 90.00, images: ['https://placehold.co/300x200/CA8A04/ffffff?text=Kobbari+1', 'https://placehold.co/300x200/A16207/ffffff?text=Kobbari+2'], sizes: [{ size: '500 g', price: 90.00 }, { size: '1 kg', price: 180.00 }, { size: '5 kg', price: 900.00 }] },
              { id: 'nut-01', name: 'Groundnut (Peanut Seeds)', descriptionKey: 'nutSeedDesc', titleColor: 'text-white bg-teal-600', basePrice: 80.00, images: ['https://placehold.co/300x200/0D9488/ffffff?text=NutSeed+1', 'https://placehold.co/300x200/047857/ffffff?text=NutSeed+2'], sizes: [{ size: '500 g', price: 80.00 }, { size: '1 kg', price: 150.00 }, { size: '5 kg', price: 750.00 }] },
@@ -373,9 +285,9 @@
             stepProcessingTitle: 'Order Processing', stepProcessingDetail: 'Order received and inventory checked.', stepShippedTitle: 'Shipped from Hub', stepShippedDetail: 'Order packaged and handed to delivery partner.', stepTransitTitle: 'In Transit', stepTransitDetail: 'Out for delivery in your local area.', stepDeliveredTitle: 'Delivered', stepDeliveredDetail: 'Order successfully delivered.',
             aboutVisionTitle: 'Our Vision: Direct from Farm to Family', aboutVisionBody: 'Root Direct was founded on the principle of transparency...', coreValuesTitle: 'Core Values & Goals', valueAuthenticity: '**Authenticity:** ...', valueFairness: '**Fairness:** ...', valueSustainability: '**Sustainability:** ...', valueDonations: '**Donations & CSR:** ...', careerTitle: 'Career & Partnership', careerBody: 'Interested in joining our mission...',
             contactTitle: 'Get in Touch', supportTitle: 'Customer Support...', supportBody: 'For order inquiries...', officeTitle: 'Operational Office', officeBody: 'Root Direct HQ...', officeNote: 'Visit by appointment...', farmerTitle: 'Farmer Partnership...', farmerBody: 'Farmers interested...',
-            signIn: 'Sign In', signOut: 'Sign Out', signInRegisterTitle: 'Sign In / Register', signInRegisterDesc: 'Sign in to manage your profile and view past orders.', createAccountLink: 'New Customer? Create Account', loginLink: 'Already a Customer? Sign In', close: 'Close',
+            signIn: 'Sign In', signOut: 'Sign Out', signInRegisterTitle: 'Sign In / Register', signInRegisterDesc: 'Sign in to manage your profile and view past orders.', createAccountLink: 'New Customer? Create Account', loginLink: 'Already a Customer? Sign In', close: 'Close', createAccount: 'Create Account',
             toastOrderSuccess: 'Order placed successfully!', toastOrderError: 'Error placing order. Please try again.', toastCartEmpty: 'Your cart is empty!', toastSignInRequired: 'Please sign in or create an account before placing an order.', toastAuthError: 'Authentication Error:', toastProductLoadError: 'Error loading products.', toastCartLoadError: 'Error loading cart.',
-            noProducts: 'No products available currently.', toastEnterOrderId: 'Please enter an Order ID.', toastTrackingStatusFound: 'Tracking status found.'
+            noProducts: 'No products available currently.', toastEnterOrderId: 'Please enter an Order ID.', toastTrackingStatusFound: 'Tracking status found.', loadingProducts: 'Loading products...', errorLoadingApp: 'Error loading application. Check console for details.'
         };
         translations.kn = {
             appTitle: 'ರೂಟ್ ಡೈರೆಕ್ಟ್', appCaption: 'ಕರ್ನಾಟಕದ ಸಮರ್ಪಿತ ರೈತರಿಂದ ನೇರವಾಗಿ ನಿಮ್ಮ ಮನೆಗೆ ತಲುಪಿಸಲಾಗುತ್ತದೆ.',
@@ -391,83 +303,91 @@
             stepProcessingTitle: 'ಆರ್ಡರ್ ಪ್ರಕ್ರಿಯೆಗೊಳಿಸಲಾಗುತ್ತಿದೆ', stepProcessingDetail: 'ಆರ್ಡರ್ ಸ್ವೀಕರಿಸಲಾಗಿದೆ...', stepShippedTitle: 'ಹಬ್‌ನಿಂದ ರವಾನೆಯಾಗಿದೆ', stepShippedDetail: 'ಆರ್ಡರ್ ಪ್ಯಾಕ್ ಮಾಡಲಾಗಿದೆ...', stepTransitTitle: 'ಸಾಗಣೆಯಲ್ಲಿ', stepTransitDetail: 'ವಿತರಣೆಗಾಗಿ ಹೊರಟಿದೆ...', stepDeliveredTitle: 'ತಲುಪಿಸಲಾಗಿದೆ', stepDeliveredDetail: 'ಆರ್ಡರ್ ಯಶಸ್ವಿಯಾಗಿ ತಲುಪಿಸಲಾಗಿದೆ.',
             aboutVisionTitle: 'ನಮ್ಮ ದೃಷ್ಟಿ: ಹೊಲದಿಂದ ಕುಟುಂಬಕ್ಕೆ ನೇರ', aboutVisionBody: 'ಪಾರದರ್ಶಕತೆ ಮತ್ತು ನ್ಯಾಯಯುತ ವ್ಯಾಪಾರದ ತತ್ವದ ಮೇಲೆ...', coreValuesTitle: 'ಕೋರ್ ಮೌಲ್ಯಗಳು ಮತ್ತು ಗುರಿಗಳು', valueAuthenticity: '**ದೃಢೀಕರಣ:** ...', valueFairness: '**ನ್ಯಾಯಸಮ್ಮತತೆ:** ...', valueSustainability: '**ಸುಸ್ಥಿರತೆ:** ...', valueDonations: '**ದೇಣಿಗೆಗಳು ಮತ್ತು CSR:** ...', careerTitle: 'ವೃತ್ತಿ ಮತ್ತು ಪಾಲುದಾರಿಕೆ', careerBody: 'ನಮ್ಮ ಮಿಷನ್‌ಗೆ ಸೇರಲು ಆಸಕ್ತಿ ಇದೆಯೇ...',
             contactTitle: 'ಸಂಪರ್ಕದಲ್ಲಿರಿ', supportTitle: 'ಗ್ರಾಹಕ ಬೆಂಬಲ...', supportBody: 'ಆರ್ಡರ್ ವಿಚಾರಣೆಗಳಿಗಾಗಿ...', officeTitle: 'ಕಾರ್ಯಾಚರಣಾ ಕಚೇರಿ', officeBody: 'ರೂಟ್ ಡೈರೆಕ್ಟ್ HQ...', officeNote: 'ನೇಮಕಾತಿಯ ಮೂಲಕ ಮಾತ್ರ...', farmerTitle: 'ರೈತ ಪಾಲುದಾರಿಕೆ...', farmerBody: 'ಪಾಲುದಾರಿಕೆಗೆ ಆಸಕ್ತಿ ಹೊಂದಿರುವ ರೈತರು...',
-            signIn: 'ಸೈನ್ ಇನ್', signOut: 'ಸೈನ್ ಔಟ್', signInRegisterTitle: 'ಸೈನ್ ಇನ್ / ನೋಂದಾಯಿಸಿ', signInRegisterDesc: 'ನಿಮ್ಮ ಪ್ರೊಫೈಲ್ ನಿರ್ವಹಿಸಲು ಮತ್ತು ಹಿಂದಿನ ಆರ್ಡರ್‌ಗಳನ್ನು ವೀಕ್ಷಿಸಲು ಸೈನ್ ಇನ್ ಮಾಡಿ.', createAccountLink: 'ಹೊಸ ಗ್ರಾಹಕ? ಖಾತೆ ರಚಿಸಿ', loginLink: 'ಈಗಾಗಲೇ ಗ್ರಾಹಕ? ಸೈನ್ ಇನ್ ಮಾಡಿ', close: 'ಮುಚ್ಚಿ',
+            signIn: 'ಸೈನ್ ಇನ್', signOut: 'ಸೈನ್ ಔಟ್', signInRegisterTitle: 'ಸೈನ್ ಇನ್ / ನೋಂದಾಯಿಸಿ', signInRegisterDesc: 'ನಿಮ್ಮ ಪ್ರೊಫೈಲ್ ನಿರ್ವಹಿಸಲು ಮತ್ತು ಹಿಂದಿನ ಆರ್ಡರ್‌ಗಳನ್ನು ವೀಕ್ಷಿಸಲು ಸೈನ್ ಇನ್ ಮಾಡಿ.', createAccountLink: 'ಹೊಸ ಗ್ರಾಹಕ? ಖಾತೆ ರಚಿಸಿ', loginLink: 'ಈಗಾಗಲೇ ಗ್ರಾಹಕ? ಸೈನ್ ಇನ್ ಮಾಡಿ', close: 'ಮುಚ್ಚಿ', createAccount: 'ಖಾತೆ ರಚಿಸಿ',
             toastOrderSuccess: 'ಆರ್ಡರ್ ಯಶಸ್ವಿಯಾಗಿ ಮಾಡಲಾಗಿದೆ!', toastOrderError: 'ಆರ್ಡರ್ ಮಾಡುವಲ್ಲಿ ದೋಷ. ದಯವಿಟ್ಟು ಮತ್ತೆ ಪ್ರಯತ್ನಿಸಿ.', toastCartEmpty: 'ನಿಮ್ಮ ಕಾರ್ಟ್ ಖಾಲಿಯಾಗಿದೆ!', toastSignInRequired: 'ಆರ್ಡರ್ ಮಾಡುವ ಮೊದಲು ದಯವಿಟ್ಟು ಸೈನ್ ಇನ್ ಮಾಡಿ ಅಥವಾ ಖಾತೆಯನ್ನು ರಚಿಸಿ.', toastAuthError: 'ದೃಢೀಕರಣ ದೋಷ:', toastProductLoadError: 'ಉತ್ಪನ್ನಗಳನ್ನು ಲೋಡ್ ಮಾಡುವಲ್ಲಿ ದೋಷ.', toastCartLoadError: 'ಕಾರ್ಟ್ ಲೋಡ್ ಮಾಡುವಲ್ಲಿ ದೋಷ.',
-            noProducts: 'ಪ್ರಸ್ತುತ ಯಾವುದೇ ಉತ್ಪನ್ನಗಳು ಲಭ್ಯವಿಲ್ಲ.', toastEnterOrderId: 'ದಯವಿಟ್ಟು ಆರ್ಡರ್ ID ನಮೂದಿಸಿ.', toastTrackingStatusFound: 'ಟ್ರ್ಯಾಕಿಂಗ್ ಸ್ಥಿತಿ ಕಂಡುಬಂದಿದೆ.'
+            noProducts: 'ಪ್ರಸ್ತುತ ಯಾವುದೇ ಉತ್ಪನ್ನಗಳು ಲಭ್ಯವಿಲ್ಲ.', toastEnterOrderId: 'ದಯವಿಟ್ಟು ಆರ್ಡರ್ ID ನಮೂದಿಸಿ.', toastTrackingStatusFound: 'ಟ್ರ್ಯಾಕಿಂಗ್ ಸ್ಥಿತಿ ಕಂಡುಬಂದಿದೆ.', loadingProducts: 'ಉತ್ಪನ್ನಗಳನ್ನು ಲೋಡ್ ಮಾಡಲಾಗುತ್ತಿದೆ...', errorLoadingApp: 'ಅಪ್ಲಿಕೇಶನ್ ಲೋಡ್ ಮಾಡುವಲ್ಲಿ ದೋಷ. ವಿವರಗಳಿಗಾಗಿ ಕನ್ಸೋಲ್ ಪರಿಶೀಲಿಸಿ.'
         };
 
 
         // --- UI Update & Translation Functions ---
-         function getTranslation(key) {
-             return translations[currentLang][key] || translations['en'][key] || key;
+         function getTranslation(key, fallback = key) {
+             try {
+                return translations[currentLang]?.[key] || translations['en']?.[key] || fallback;
+             } catch (e) {
+                 console.error(`Translation error for key: ${key}`, e);
+                 return fallback;
+             }
          }
 
          function updateUIText() {
-             // Update elements with data-translate attribute
-             document.querySelectorAll('[data-translate]').forEach(el => {
-                 const key = el.getAttribute('data-translate');
-                 if (key) el.innerHTML = getTranslation(key);
-             });
-             // Update elements with data-placeholder-translate attribute
-             document.querySelectorAll('[data-placeholder-translate]').forEach(el => {
-                 const key = el.getAttribute('data-placeholder-translate');
-                 if (key) el.placeholder = getTranslation(key);
-             });
-             // Update button texts specifically
-             document.querySelectorAll('[data-translate-signin], [data-translate-signout], [data-translate-create], [data-translate-login], [data-translate-signin-title], [data-translate-signin-desc], [data-translate-close]').forEach(el => {
-                 for (const attr of el.attributes) {
-                     if (attr.name.startsWith('data-translate-')) {
-                         const key = attr.value;
-                         if (key) el.textContent = getTranslation(key);
-                         break; // Assuming only one such attribute per element
-                     }
-                 }
-             });
-             // Special handling for auth toggle button based on state
-             const toggleAuthModeButton = document.getElementById('toggleAuthMode');
-             if (toggleAuthModeButton) {
-                 toggleAuthModeButton.textContent = getTranslation(isSignInMode ? 'createAccountLink' : 'loginLink');
-             }
-             const authSubmitButton = document.getElementById('authSubmitButton');
-              if (authSubmitButton) {
-                  authSubmitButton.textContent = getTranslation(isSignInMode ? 'signIn' : 'createAccount'); // Use 'createAccount' key
-             }
+            try {
+                // Update elements with data-translate attribute
+                document.querySelectorAll('[data-translate]').forEach(el => {
+                    const key = el.getAttribute('data-translate');
+                    if (key) el.innerHTML = getTranslation(key);
+                });
+                // Update elements with data-placeholder-translate attribute
+                document.querySelectorAll('[data-placeholder-translate]').forEach(el => {
+                    const key = el.getAttribute('data-placeholder-translate');
+                    if (key) el.placeholder = getTranslation(key);
+                });
+                // Update button texts specifically based on their purpose
+                document.querySelectorAll('[data-translate-signin], [data-translate-signout], [data-translate-create], [data-translate-login], [data-translate-signin-title], [data-translate-signin-desc], [data-translate-close]').forEach(el => {
+                    for (const attr of el.attributes) {
+                        if (attr.name.startsWith('data-translate-')) {
+                            const key = attr.value;
+                            if (key) el.textContent = getTranslation(key);
+                            break;
+                        }
+                    }
+                });
+                // Special handling for auth toggle button based on state
+                const toggleAuthModeButton = document.getElementById('toggleAuthMode');
+                if (toggleAuthModeButton) {
+                    toggleAuthModeButton.textContent = getTranslation(isSignInMode ? 'createAccountLink' : 'loginLink');
+                }
+                const authSubmitButton = document.getElementById('authSubmitButton');
+                if (authSubmitButton) {
+                    authSubmitButton.textContent = getTranslation(isSignInMode ? 'signIn' : 'createAccount');
+                }
 
+                // Update language toggle button text
+                const langToggle = document.getElementById('lang-toggle');
+                if(langToggle) langToggle.innerText = getTranslation('langToggle');
 
-             // Update language toggle button text
-             const langToggle = document.getElementById('lang-toggle');
-             if(langToggle) langToggle.innerText = getTranslation('langToggle');
+                // Update specific UI elements that might change text
+                const loadingIndicator = document.getElementById('loadingIndicator');
+                if (loadingIndicator && !loadingIndicator.classList.contains('hidden')) {
+                    loadingIndicator.textContent = getTranslation('loadingProducts');
+                }
+                const errorIndicator = document.getElementById('errorIndicator');
+                if (errorIndicator && !errorIndicator.classList.contains('hidden')) {
+                    errorIndicator.textContent = getTranslation('errorLoadingApp');
+                }
 
-             // Re-render products if they exist
-             if (products && products.length > 0) renderProducts(products);
-             else {
-                 // Ensure loading/error indicators are handled if products aren't ready
-                 const loadingIndicator = document.getElementById('loadingIndicator');
-                 const errorIndicator = document.getElementById('errorIndicator');
-                 if (loadingIndicator && !loadingIndicator.classList.contains('hidden')) {
-                     loadingIndicator.textContent = getTranslation('loadingProducts'); // Assuming this key exists
-                 }
-                 if (errorIndicator && !errorIndicator.classList.contains('hidden')) {
-                     errorIndicator.textContent = getTranslation('toastProductLoadError');
-                 }
-             }
+                // Re-render products if they exist (to update descriptions)
+                if (products && products.length > 0) renderProducts(products);
 
-             calculateCart(); // Update cart text
+                calculateCart(); // Update cart text
 
-             // Re-render tracking if that view is active
-             if (!document.getElementById('tracking-view')?.classList.contains('hidden')) {
-                 const orderId = document.getElementById('order-id-input')?.value;
-                 if (orderId) simulateTracking(orderId); // Rerender with translations
-             }
+                // Re-render tracking if that view is active
+                if (!document.getElementById('tracking-view')?.classList.contains('hidden')) {
+                    const orderId = document.getElementById('order-id-input')?.value;
+                    if (orderId) simulateTracking(orderId); // Rerender with translations
+                }
+            } catch (e) {
+                 console.error("Error during UI text update:", e);
+            }
          }
 
+         // Make sure functions called by HTML are on the window object
          window.toggleLanguage = function() {
              currentLang = currentLang === 'en' ? 'kn' : 'en';
              updateUIText();
          }
 
         // --- Utility: Toast Notifications ---
-        function showToast(key, type = 'success') {
+        function showToast(key, type = 'success', extraMessage = '') {
             const message = getTranslation(key);
             const container = document.getElementById('toast-container');
             if (!container) {
@@ -477,84 +397,95 @@
 
             const toast = document.createElement('div');
             toast.className = `toast ${type}`;
-            toast.textContent = `${type === 'error' ? 'Error: ' : ''}${message}`;
+            toast.textContent = `${type === 'error' ? 'Error: ' : ''}${message} ${extraMessage}`;
             container.appendChild(toast);
 
-            // Trigger reflow to enable animation
             requestAnimationFrame(() => {
                  requestAnimationFrame(() => {
                      toast.classList.add('show');
                  });
             });
 
-
             setTimeout(() => {
                 toast.classList.remove('show');
-                setTimeout(() => toast.remove(), 300); // Remove after fade out
+                setTimeout(() => toast.remove(), 300);
             }, 4000);
         }
-        window.showToast = showToast; // Make globally accessible
+        window.showToast = showToast;
 
         // --- Database Path Helpers ---
-        function getProductsDocRef(dbInstance, userIdToUse) {
-            return doc(dbInstance, 'artifacts', appId, 'users', userIdToUse, 'config', 'products');
-        }
-        function getCartDocRef(dbInstance, userIdToUse) {
-            return doc(dbInstance, 'artifacts', appId, 'users', userIdToUse, 'config', 'cart');
-        }
-        function getOrdersCollectionRef(dbInstance) {
-            return collection(dbInstance, 'artifacts', appId, 'public', 'data', 'orders');
-        }
+        function getProductsDocRef(dbInstance, userIdToUse) { return doc(dbInstance, 'artifacts', appId, 'users', userIdToUse, 'config', 'products'); }
+        function getCartDocRef(dbInstance, userIdToUse) { return doc(dbInstance, 'artifacts', appId, 'users', userIdToUse, 'config', 'cart'); }
+        function getOrdersCollectionRef(dbInstance) { return collection(dbInstance, 'artifacts', appId, 'public', 'data', 'orders'); }
 
-        // --- Retry Logic for Async Operations ---
+        // --- Retry Logic ---
         async function fetchWithRetry(asyncFn, retries = 3, delay = 500) {
             for (let i = 0; i < retries; i++) {
                 try {
                     return await asyncFn();
                 } catch (error) {
-                    if (i === retries - 1) throw error; // Rethrow last error
-                    console.warn(`Operation failed (attempt ${i + 1}). Retrying in ${delay}ms...`, error);
+                    if (i === retries - 1) throw error;
+                    console.warn(`Operation failed (attempt ${i + 1}). Retrying in ${delay}ms...`, error.code || error.message);
+                    if (error.code === 'permission-denied' || error.message.includes('permission')) {
+                         console.error("PERMISSION DENIED. Check Firestore rules!");
+                         throw error;
+                    }
                     await new Promise(resolve => setTimeout(resolve, delay));
-                    delay *= 2; // Exponential backoff
+                    delay *= 2;
                 }
             }
         }
 
+
         // --- Database Operations ---
          async function initializeProducts(dbInstance, userIdToUse) {
-             console.log("Initializing products for user:", userIdToUse);
+             console.log("Initializing/Fetching products for user:", userIdToUse);
+             const loadingIndicator = document.getElementById('loadingIndicator');
+             const errorIndicator = document.getElementById('errorIndicator');
+
              if (!dbInstance || !userIdToUse) {
-                 console.error("DB or UserID missing for product initialization.");
-                 showToast('toastProductLoadError', 'error');
-                 return []; // Return empty on fundamental error
+                 console.error("DB or UserID missing for product fetch.");
+                 if(errorIndicator) {
+                    errorIndicator.textContent = getTranslation('errorLoadingApp') + " (DB Init Failed)"; // More specific error
+                    errorIndicator.classList.remove('hidden');
+                 }
+                 if(loadingIndicator) loadingIndicator.classList.add('hidden');
+                 return [];
              }
              const productsDocRef = getProductsDocRef(dbInstance, userIdToUse);
              try {
                  const docSnap = await getDoc(productsDocRef);
                  if (!docSnap.exists() || !docSnap.data().products || docSnap.data().products.length === 0) {
-                     console.log("No products found in DB. Setting default products.");
+                     console.log("No products found in DB for this user. Setting default products.");
                      const data = { products: defaultProducts, lastUpdated: new Date() };
-                     await setDoc(productsDocRef, data);
-                     return defaultProducts;
+                     try {
+                        await setDoc(productsDocRef, data);
+                        console.log("Default products written successfully.");
+                        return defaultProducts;
+                     } catch (writeError) {
+                         console.error("Error writing default products:", writeError);
+                         showToast('toastProductLoadError', 'error', `: ${writeError.message}`);
+                         return defaultProducts;
+                     }
                  } else {
-                     console.log("Products loaded from DB.");
+                     console.log("Products loaded successfully from DB.");
                      return docSnap.data().products;
                  }
              } catch (error) {
                  console.error("Error fetching/initializing products:", error);
-                 showToast('toastProductLoadError', 'error');
-                 const errorIndicator = document.getElementById('errorIndicator');
+                 showToast('toastProductLoadError', 'error', `: ${error.message}`);
                  if(errorIndicator) {
                      errorIndicator.textContent = `${getTranslation('toastProductLoadError')}: ${error.message}`;
                      errorIndicator.classList.remove('hidden');
                  }
-                 document.getElementById('loadingIndicator')?.classList.add('hidden');
-                 return []; // Return empty on error
+                 if(loadingIndicator) loadingIndicator.classList.add('hidden');
+                 return [];
              }
          }
 
+
          async function saveCartToDB(currentCart) {
-             if (!db || !userId || auth?.currentUser?.isAnonymous) return;
+             if (!db || !userId || !auth?.currentUser || auth.currentUser.isAnonymous) return;
              const cartDocRef = getCartDocRef(db, userId);
              const data = { cart: currentCart, lastUpdated: new Date() };
              try {
@@ -562,33 +493,28 @@
                  console.log("Cart saved to DB for user:", userId);
              } catch (error) {
                  console.error("Error saving cart to DB:", error);
-                 // showToast('toastCartSaveError', 'error'); // Optional: Add translation key
              }
          }
 
         async function saveOrderToDB(orderData) {
-            if (!db) {
-                console.error("Firestore not initialized. Cannot save order.");
-                throw new Error("Database not ready.");
-            }
-             const ordersColRef = getOrdersCollectionRef(db);
-             try {
-                 // Ensure userId is valid before saving
-                 if (!userId || auth?.currentUser?.isAnonymous) {
-                     throw new Error("User must be signed in to place an order.");
-                 }
-                 await addDoc(ordersColRef, {
+            if (!db) throw new Error("Database not ready.");
+            const ordersColRef = getOrdersCollectionRef(db);
+            try {
+                 if (!userId || !auth?.currentUser || auth.currentUser.isAnonymous) throw new Error("User must be signed in to place an order.");
+                 const docRef = await addDoc(ordersColRef, {
                      ...orderData,
-                     userId: userId, // Associate order with the SIGNED IN user
+                     userId: userId,
                      timestamp: new Date(),
-                     status: 'Processing' // Initial status
+                     status: 'Processing'
                  });
-                 console.log("Order saved successfully to public collection.");
+                 console.log("Order saved successfully with ID:", docRef.id);
+                 return docRef.id;
              } catch (error) {
                  console.error("Error saving order:", error);
-                 throw error; // Re-throw to handle in UI
+                 throw error;
              }
          }
+
 
          async function loadCartFromDB(userIdToLoad) {
             if (!db || !userIdToLoad) return {};
@@ -598,29 +524,31 @@
                 if (docSnap.exists()) {
                     console.log("Cart loaded from DB for user:", userIdToLoad);
                     return docSnap.data().cart || {};
+                } else {
+                    console.log("No cart document found for user:", userIdToLoad);
+                    return {};
                 }
             } catch (error) {
                 console.error("Error loading cart from DB:", error);
                  showToast('toastCartLoadError', 'error');
+                 return {};
             }
-            return {};
         }
+
 
         // --- UI Rendering ---
         function renderProducts(currentProducts) {
-             products = currentProducts; // Update global products array
+             products = currentProducts; // Update global
              const grid = document.getElementById('productGrid');
              const loadingIndicator = document.getElementById('loadingIndicator');
              const errorIndicator = document.getElementById('errorIndicator');
 
              if (!grid) { console.error("Product grid element not found"); return; }
-             grid.innerHTML = ''; // Clear previous items
+             grid.innerHTML = ''; // Clear
 
              if (!products || products.length === 0) {
-                 if (loadingIndicator && !loadingIndicator.classList.contains('hidden')) {
-                     loadingIndicator.classList.add('hidden'); // Hide loading if no products found after load attempt
-                 }
-                 if (errorIndicator && errorIndicator.classList.contains('hidden')) { // Avoid showing error if already shown by init
+                 if (loadingIndicator) loadingIndicator.classList.add('hidden');
+                 if (errorIndicator && errorIndicator.classList.contains('hidden')) {
                     grid.innerHTML = `<p class="text-gray-500 col-span-full text-center py-10" data-translate="noProducts">${getTranslation('noProducts')}</p>`;
                  }
                  return;
@@ -631,17 +559,17 @@
 
              products.forEach(product => {
                  const card = document.createElement('div');
-                 card.className = 'product-card bg-white rounded-xl overflow-hidden shadow-lg border border-gray-100 flex flex-col'; // Use flex column
+                 card.className = 'product-card bg-white rounded-xl overflow-hidden shadow-lg border border-gray-100 flex flex-col';
 
-                 // --- Image Carousel Structure ---
+                 // Image Carousel
                  const imageContainer = document.createElement('div');
                  imageContainer.className = 'image-container h-48 w-full relative';
                  imageContainer.setAttribute('data-product-id', product.id);
                  imageContainer.setAttribute('data-current-index', '0');
 
-                 (product.images || [/* Default image URL */]).forEach((imgUrl, index) => {
+                 (product.images || ['https://placehold.co/300x200/cccccc/ffffff?text=No+Image']).forEach((imgUrl, index) => {
                      const img = document.createElement('img');
-                     img.src = imgUrl || 'https://placehold.co/300x200/cccccc/ffffff?text=Image+Missing';
+                     img.src = imgUrl;
                      img.alt = `${product.name} image ${index + 1}`;
                      img.className = `product-image absolute top-0 left-0 w-full h-full object-cover transition-opacity duration-300 ${index === 0 ? 'opacity-100 z-10' : 'opacity-0 z-0'}`;
                      img.setAttribute('data-index', index);
@@ -651,23 +579,22 @@
 
                  if ((product.images?.length || 0) > 1) {
                      const prevBtn = document.createElement('button');
-                     prevBtn.innerHTML = '&#10094;'; // Left arrow
+                     prevBtn.innerHTML = '&#10094;';
                      prevBtn.className = 'carousel-btn prev p-2 bg-black bg-opacity-40 text-white rounded-full absolute top-1/2 left-2 transform -translate-y-1/2 z-20 hover:bg-opacity-60';
-                     prevBtn.onclick = () => changeProductImage(product.id, -1);
+                     prevBtn.onclick = (e) => { e.stopPropagation(); window.changeProductImage(product.id, -1); }; // Ensure window scope
                      imageContainer.appendChild(prevBtn);
 
                      const nextBtn = document.createElement('button');
-                     nextBtn.innerHTML = '&#10095;'; // Right arrow
+                     nextBtn.innerHTML = '&#10095;';
                      nextBtn.className = 'carousel-btn next p-2 bg-black bg-opacity-40 text-white rounded-full absolute top-1/2 right-2 transform -translate-y-1/2 z-20 hover:bg-opacity-60';
-                     nextBtn.onclick = () => changeProductImage(product.id, 1);
+                     nextBtn.onclick = (e) => { e.stopPropagation(); window.changeProductImage(product.id, 1); }; // Ensure window scope
                      imageContainer.appendChild(nextBtn);
                  }
                  card.appendChild(imageContainer);
 
-                 // --- Product Details ---
+                 // Product Details
                  const detailsDiv = document.createElement('div');
                  detailsDiv.className = 'p-4 flex flex-col flex-grow';
-
                  const titleColor = product.titleColor || 'bg-gray-200 text-gray-800';
                  detailsDiv.innerHTML = `
                      <div class="mb-3">
@@ -684,9 +611,9 @@
                                          <span class="text-sm text-gray-500">${sizeOption.size}</span>
                                      </div>
                                      <div class="flex items-center space-x-1">
-                                         <button onclick="window.updateCart('${cartId}', -1)" class="qty-button bg-orange-100 text-orange-600 rounded-full hover:bg-orange-200">-</button>
+                                         <button onclick="event.stopPropagation(); window.updateCart('${cartId}', -1)" class="qty-button bg-orange-100 text-orange-600 rounded-full hover:bg-orange-200">-</button>
                                          <span id="qty-${cartId}" class="w-8 text-center font-bold text-gray-700">${currentQty}</span>
-                                         <button onclick="window.updateCart('${cartId}', 1)" class="qty-button bg-green-100 text-green-600 rounded-full hover:bg-green-200">+</button>
+                                         <button onclick="event.stopPropagation(); window.updateCart('${cartId}', 1)" class="qty-button bg-green-100 text-green-600 rounded-full hover:bg-green-200">+</button>
                                      </div>
                                  </div>
                              `;
@@ -696,126 +623,98 @@
                  card.appendChild(detailsDiv);
                  grid.appendChild(card);
              });
-             calculateCart(); // Update cart footer
+             calculateCart();
          }
 
         // --- Cart Logic ---
          window.updateCart = function(cartId, change) {
-             if (!products.length) return; // Products not loaded yet
-
+            if (!products || products.length === 0) { console.warn("Products not loaded yet."); return; }
              const [productId, sizeIndexStr] = cartId.split('-');
              const sizeIndex = parseInt(sizeIndexStr);
              const product = products.find(p => p.id === productId);
-             if (!product || !product.sizes || !product.sizes[sizeIndex]) {
-                 console.error("Product or size not found for cartId:", cartId);
-                 return;
-             }
+             if (!product || !product.sizes || !product.sizes[sizeIndex]) { console.error("Product or size info missing for:", cartId); return; }
              const sizeOption = product.sizes[sizeIndex];
-
-             if (!cart[cartId]) {
-                 cart[cartId] = { productId, productName: product.name, size: sizeOption.size, price: sizeOption.price, quantity: 0 };
-             }
-
+             if (!cart[cartId]) { cart[cartId] = { productId, productName: product.name, size: sizeOption.size, price: sizeOption.price, quantity: 0 }; }
              const newQty = Math.max(0, cart[cartId].quantity + change);
-
-             if (newQty > 0) {
-                 cart[cartId].quantity = newQty;
-             } else {
-                 delete cart[cartId]; // Remove if zero
-             }
-
+             if (newQty > 0) { cart[cartId].quantity = newQty; } else { delete cart[cartId]; }
              const qtyElement = document.getElementById(`qty-${cartId}`);
              if (qtyElement) qtyElement.textContent = newQty;
-
-             calculateCart(); // Recalculate and update UI/DB
+             calculateCart();
          }
 
          function calculateCart() {
              let totalItems = 0;
              let totalAmount = 0;
              Object.values(cart).forEach(item => {
-                 totalItems += item.quantity;
-                 totalAmount += item.quantity * item.price;
+                 if(item && typeof item.quantity === 'number' && typeof item.price === 'number') {
+                     totalItems += item.quantity;
+                     totalAmount += item.quantity * item.price;
+                 } else { console.warn("Invalid item in cart:", item); }
              });
-
              const itemCountEl = document.getElementById('cart-item-count');
              const totalEl = document.getElementById('cart-total');
              const proceedButton = document.getElementById('proceedToOrderButton');
-
              if (itemCountEl) itemCountEl.textContent = totalItems;
              if (totalEl) totalEl.textContent = `₹${totalAmount.toFixed(2)}`;
-
              if (proceedButton) {
-                 // Enable button only if items > 0 AND user is NOT anonymous
                  const userIsReal = auth?.currentUser && !auth.currentUser.isAnonymous;
                  proceedButton.disabled = !(totalItems > 0 && userIsReal);
-                 // Update text based on disabled state if needed, or use CSS classes
-                 if (proceedButton.disabled && totalItems > 0 && !userIsReal) {
-                     proceedButton.title = getTranslation('toastSignInRequired'); // Tooltip
-                 } else {
-                      proceedButton.title = '';
-                 }
+                 proceedButton.title = (proceedButton.disabled && totalItems > 0 && !userIsReal) ? getTranslation('toastSignInRequired') : '';
              }
-
-             // Debounced save to DB for logged-in users
+             // Debounced save for logged-in users
              clearTimeout(window.saveCartTimeout);
-             window.saveCartTimeout = setTimeout(() => saveCartToDB(cart), 1500); // Increased delay slightly
+             window.saveCartTimeout = setTimeout(() => saveCartToDB(cart), 1500);
          }
          window.calculateCart = calculateCart; // Make global
 
-        // --- Image Carousel Logic ---
-         function changeProductImage(productId, direction) {
+        // --- Image Carousel ---
+         window.changeProductImage = function(productId, direction) { // Ensure it's on window
              const container = document.querySelector(`.image-container[data-product-id="${productId}"]`);
              if (!container) return;
              const images = container.querySelectorAll('.product-image');
              if (images.length <= 1) return;
-
              let currentIndex = parseInt(container.getAttribute('data-current-index') || '0');
              let nextIndex = (currentIndex + direction + images.length) % images.length;
-
              images[currentIndex].classList.remove('opacity-100', 'z-10');
              images[currentIndex].classList.add('opacity-0', 'z-0');
              images[nextIndex].classList.remove('opacity-0', 'z-0');
              images[nextIndex].classList.add('opacity-100', 'z-10');
-
              container.setAttribute('data-current-index', nextIndex);
          }
-         window.changeProductImage = changeProductImage;
 
-         // --- View Switching Logic ---
-         const viewBackgroundClasses = { /* ... (same as before) ... */ };
+         // --- View Switching ---
+         const viewBackgroundClasses = { /* ... */ };
          viewBackgroundClasses['products-view'] = 'bg-products';
          viewBackgroundClasses['tracking-view'] = 'bg-tracking';
          viewBackgroundClasses['about-view'] = 'bg-about';
          viewBackgroundClasses['contact-view'] = 'bg-contact';
 
-         function showView(viewId) {
+         window.showView = function(viewId) { // Ensure it's on window
              document.querySelectorAll('.view-content').forEach(view => view.classList.add('hidden'));
              document.querySelectorAll('nav a').forEach(link => {
                  link.classList.remove('border-green-700', 'text-green-700');
                  link.classList.add('text-gray-500', 'border-transparent');
              });
-
              const selectedView = document.getElementById(viewId);
              if (selectedView) selectedView.classList.remove('hidden');
-
              const navLink = document.getElementById(`nav-${viewId.replace('-view', '')}`);
              if (navLink) {
                  navLink.classList.remove('text-gray-500', 'border-transparent');
                  navLink.classList.add('text-green-700', 'border-green-700');
              }
-
-             // Apply Background
              const pageContent = document.getElementById('page-content');
-             Object.values(viewBackgroundClasses).forEach(cls => pageContent.classList.remove(cls));
-             if (viewBackgroundClasses[viewId]) {
-                 pageContent.classList.add(viewBackgroundClasses[viewId]);
+             if (pageContent) { // Add null check
+                Object.values(viewBackgroundClasses).forEach(cls => pageContent.classList.remove(cls));
+                if (viewBackgroundClasses[viewId]) {
+                    pageContent.classList.add(viewBackgroundClasses[viewId]);
+                }
+             } else {
+                 console.error("page-content element not found!");
              }
          }
-         window.showView = showView; // Make global
 
-         // --- Order Tracking Logic ---
-         const TRACKING_STEPS_EN = [ /* ... (same as before) ... */ ];
+         // --- Order Tracking ---
+         const TRACKING_STEPS_EN = [ /* ... */ ];
          TRACKING_STEPS_EN.push(
             { id: 'step-processing', titleKey: 'stepProcessingTitle', detailKey: 'stepProcessingDetail' },
             { id: 'step-shipped', titleKey: 'stepShippedTitle', detailKey: 'stepShippedDetail' },
@@ -823,33 +722,24 @@
             { id: 'step-delivered', titleKey: 'stepDeliveredTitle', detailKey: 'stepDeliveredDetail' }
         );
 
-         function simulateTracking(overrideOrderId) {
-            // ... (tracking logic, using getTranslation) ...
-            const orderIdInput = document.getElementById('order-id-input');
-            const orderId = overrideOrderId || orderIdInput?.value.toUpperCase().trim() || "";
-            const trackingContainer = document.getElementById('tracking-status-container');
-            const initialPrompt = document.getElementById('tracking-initial-prompt');
-            const displayOrderId = document.getElementById('display-order-id');
-            const deliveryTimeline = document.getElementById('delivery-timeline');
-
-            if (!trackingContainer || !initialPrompt || !displayOrderId || !deliveryTimeline) return; // Elements not ready
-
-            let simulatedStatusIndex = -1;
-            let hash = 0;
-            for (let i = 0; i < orderId.length; i++) { hash = (hash << 5) - hash + orderId.charCodeAt(i); hash |= 0; }
-            simulatedStatusIndex = Math.abs(hash) % TRACKING_STEPS_EN.length;
-
-            if (orderId === "") {
-                if(!overrideOrderId) showToast('toastEnterOrderId', 'error');
-                return;
-            }
-
-            initialPrompt.classList.add('hidden');
-            trackingContainer.classList.remove('hidden');
-            displayOrderId.innerText = orderId;
-            deliveryTimeline.innerHTML = ''; // Clear
-
-            deliveryTimeline.innerHTML = TRACKING_STEPS_EN.map((step, index) => `
+         window.simulateTracking = function(overrideOrderId) { // Ensure it's on window
+             const orderIdInput = document.getElementById('order-id-input');
+             const orderId = overrideOrderId || orderIdInput?.value.toUpperCase().trim() || "";
+             const trackingContainer = document.getElementById('tracking-status-container');
+             const initialPrompt = document.getElementById('tracking-initial-prompt');
+             const displayOrderId = document.getElementById('display-order-id');
+             const deliveryTimeline = document.getElementById('delivery-timeline');
+             if (!trackingContainer || !initialPrompt || !displayOrderId || !deliveryTimeline) return;
+             let simulatedStatusIndex = -1;
+             let hash = 0;
+             for (let i = 0; i < orderId.length; i++) { hash = (hash << 5) - hash + orderId.charCodeAt(i); hash |= 0; }
+             simulatedStatusIndex = Math.abs(hash) % TRACKING_STEPS_EN.length;
+             if (orderId === "") { if(!overrideOrderId) showToast('toastEnterOrderId', 'error'); return; }
+             initialPrompt.classList.add('hidden');
+             trackingContainer.classList.remove('hidden');
+             displayOrderId.innerText = orderId;
+             deliveryTimeline.innerHTML = '';
+             deliveryTimeline.innerHTML = TRACKING_STEPS_EN.map((step, index) => `
                 <div id="${step.id}-${orderId}" class="timeline-item ${index <= simulatedStatusIndex ? 'active' : ''}">
                     <div class="timeline-bullet"></div>
                     <p class="font-semibold text-gray-700">${getTranslation(step.titleKey)}</p>
@@ -857,55 +747,42 @@
                 </div>
             `).join('');
 
-            if (!overrideOrderId) {
-                showToast('toastTrackingStatusFound', 'success');
-            }
+             if (!overrideOrderId) { showToast('toastTrackingStatusFound', 'success'); }
          }
-         window.simulateTracking = simulateTracking; // Make global
 
          // --- Modal Handling ---
          const authModal = document.getElementById('authModal');
          const orderModal = document.getElementById('orderModal');
          window.openAuthModal = () => { if(authModal) authModal.style.display = 'flex'; }
          window.closeAuthModal = () => { if(authModal) authModal.style.display = 'none'; }
-         window.openOrderModal = () => {
-             // Reset to step 1
-             const form = document.getElementById('deliveryForm');
-             const paymentDiv = document.getElementById('paymentDetails');
-             const title = document.getElementById('orderModalTitle');
-             if(form) form.classList.remove('hidden');
-             if(paymentDiv) paymentDiv.classList.add('hidden');
-             if(title) title.textContent = getTranslation('deliveryDetailsTitle');
-             if(orderModal) orderModal.style.display = 'flex';
+         window.openOrderModal = () => { /* ... same as before ... */
+            const form = document.getElementById('deliveryForm');
+            const paymentDiv = document.getElementById('paymentDetails');
+            const title = document.getElementById('orderModalTitle');
+            if(form) form.classList.remove('hidden');
+            if(paymentDiv) paymentDiv.classList.add('hidden');
+            if(title) title.textContent = getTranslation('deliveryDetailsTitle');
+            if(orderModal) orderModal.style.display = 'flex';
          }
          window.closeOrderModal = () => { if(orderModal) orderModal.style.display = 'none'; }
-
-         // Close modal if clicked outside content
          authModal?.addEventListener('click', (e) => { if (e.target === authModal) closeAuthModal(); });
          orderModal?.addEventListener('click', (e) => { if (e.target === orderModal) closeOrderModal(); });
 
 
         // --- Authentication Logic ---
         function setupAuthListeners() {
-            const authToggleButton = document.getElementById('authToggleButton');
-            const authForm = document.getElementById('authForm');
-            const authSubmitButton = document.getElementById('authSubmitButton');
-            const toggleAuthModeButton = document.getElementById('toggleAuthMode');
-            const authMessageEl = document.getElementById('authMessage');
-            const closeAuthModalButton = document.getElementById('closeAuthModal');
-
-             if (!authToggleButton || !authForm || !authSubmitButton || !toggleAuthModeButton || !authMessageEl || !closeAuthModalButton) {
-                 console.error("Auth modal elements not found!");
-                 return;
-             }
-
-             // Initial button state set in onAuthStateChanged
-             authToggleButton.onclick = openAuthModal; // Default is Sign In
+             const authToggleButton = document.getElementById('authToggleButton');
+             const authForm = document.getElementById('authForm');
+             const authSubmitButton = document.getElementById('authSubmitButton');
+             const toggleAuthModeButton = document.getElementById('toggleAuthMode');
+             const authMessageEl = document.getElementById('authMessage');
+             const closeAuthModalButton = document.getElementById('closeAuthModal');
+             if (!authToggleButton || !authForm || !authSubmitButton || !toggleAuthModeButton || !authMessageEl || !closeAuthModalButton) { console.error("Auth modal elements not found!"); return; }
 
              toggleAuthModeButton.addEventListener('click', (e) => {
                 e.preventDefault();
                 isSignInMode = !isSignInMode;
-                authSubmitButton.textContent = getTranslation(isSignInMode ? 'signIn' : 'createAccount'); // Use new key
+                authSubmitButton.textContent = getTranslation(isSignInMode ? 'signIn' : 'createAccount');
                 toggleAuthModeButton.textContent = getTranslation(isSignInMode ? 'createAccountLink' : 'loginLink');
                 document.querySelector('#authModal h3').textContent = getTranslation('signInRegisterTitle');
                 authMessageEl.textContent = '';
@@ -918,64 +795,41 @@
                 const email = document.getElementById('authEmail').value;
                 const password = document.getElementById('authPassword').value;
                 authMessageEl.textContent = 'Processing...';
-
-                 if (!auth) {
-                     authMessageEl.textContent = "Auth service not ready.";
-                     return;
-                 }
-
+                if (!auth) { authMessageEl.textContent = "Auth service not ready."; return; }
                 try {
-                    if (isSignInMode) {
-                        await signInWithEmailAndPassword(auth, email, password);
-                    } else {
-                        await createUserWithEmailAndPassword(auth, email, password);
-                    }
+                    if (isSignInMode) { await signInWithEmailAndPassword(auth, email, password); }
+                    else { await createUserWithEmailAndPassword(auth, email, password); }
                     authMessageEl.textContent = '';
                     closeAuthModal();
-                    // --- Auto-proceed to checkout if triggered during order ---
-                    if (window.pendingCheckoutAction) {
-                         openOrderModal();
-                         window.pendingCheckoutAction = false; // Reset flag
-                    }
+                    if (window.pendingCheckoutAction) { openOrderModal(); window.pendingCheckoutAction = false; }
                 } catch (error) {
-                    let errorMessage = 'An unknown error occurred.';
-                    if (error.code) {
-                        errorMessage = error.message.replace('Firebase: ', '').replace(/\(.*\)/, '').trim();
-                    }
+                    let errorMessage = error.message.replace('Firebase: ', '').replace(/\(.*\)/, '').trim();
                     authMessageEl.textContent = `${getTranslation('toastAuthError')} ${errorMessage}`;
                     console.error("Auth Error:", error);
-                }
-            });
+                 }
+             });
         }
 
         // --- Order Placement Logic ---
         function setupOrderListeners() {
-            const proceedButton = document.getElementById('proceedToOrderButton');
-            const deliveryForm = document.getElementById('deliveryForm');
-            const placeOrderButton = document.getElementById('placeOrderButton');
-            const cancelOrderButton = document.getElementById('cancelOrder');
-            const backToDeliveryButton = document.getElementById('backToDelivery');
+             const proceedButton = document.getElementById('proceedToOrderButton');
+             const deliveryForm = document.getElementById('deliveryForm');
+             const placeOrderButton = document.getElementById('placeOrderButton');
+             const cancelOrderButton = document.getElementById('cancelOrder');
+             const backToDeliveryButton = document.getElementById('backToDelivery');
+            if (!proceedButton || !deliveryForm || !placeOrderButton || !cancelOrderButton || !backToDeliveryButton) { console.error("Order modal elements not found!"); return; }
 
-             if (!proceedButton || !deliveryForm || !placeOrderButton || !cancelOrderButton || !backToDeliveryButton) {
-                 console.error("Order modal elements not found!");
-                 return;
-             }
-
-             proceedButton.addEventListener('click', () => {
-                 if (!auth?.currentUser || auth.currentUser.isAnonymous) {
+            proceedButton.addEventListener('click', () => {
+                if (!auth?.currentUser || auth.currentUser.isAnonymous) {
                      showToast('toastSignInRequired', 'error');
-                     window.pendingCheckoutAction = true; // Set flag to proceed after login
-                     openAuthModal(); // Prompt user to sign in
-                 } else if (Object.keys(cart).length > 0) {
-                     openOrderModal(); // Open if signed in and cart has items
-                 } else {
-                     showToast('toastCartEmpty', 'error');
-                 }
-             });
+                     window.pendingCheckoutAction = true;
+                     openAuthModal();
+                 } else if (Object.keys(cart).length > 0) { openOrderModal(); }
+                 else { showToast('toastCartEmpty', 'error'); }
+            });
 
-             deliveryForm.addEventListener('submit', (e) => {
+            deliveryForm.addEventListener('submit', (e) => {
                  e.preventDefault();
-                 // Show payment details / summary
                  const summaryList = document.getElementById('orderSummaryList');
                  summaryList.innerHTML = '';
                  let totalAmount = 0;
@@ -988,52 +842,36 @@
                      }
                  });
                  document.getElementById('paymentTotal').textContent = `₹${totalAmount.toFixed(2)}`;
-
-                 // Switch view
                  deliveryForm.classList.add('hidden');
                  document.getElementById('paymentDetails').classList.remove('hidden');
                  document.getElementById('orderModalTitle').textContent = getTranslation('paymentConfirmationTitle');
              });
 
-             backToDeliveryButton.addEventListener('click', () => {
-                 deliveryForm.classList.remove('hidden');
-                 document.getElementById('paymentDetails').classList.add('hidden');
-                 document.getElementById('orderModalTitle').textContent = getTranslation('deliveryDetailsTitle');
-             });
+            backToDeliveryButton.addEventListener('click', () => {
+                deliveryForm.classList.remove('hidden');
+                document.getElementById('paymentDetails').classList.add('hidden');
+                document.getElementById('orderModalTitle').textContent = getTranslation('deliveryDetailsTitle');
+            });
 
-             cancelOrderButton.addEventListener('click', closeOrderModal);
+            cancelOrderButton.addEventListener('click', closeOrderModal);
 
-             placeOrderButton.addEventListener('click', async () => {
-                 if (!userId || auth?.currentUser?.isAnonymous) {
-                     showToast('toastSignInRequired', 'error'); // Should not happen due to proceed check, but good failsafe
-                     return;
-                 }
+            placeOrderButton.addEventListener('click', async () => {
+                 if (!userId || auth?.currentUser?.isAnonymous) { showToast('toastSignInRequired', 'error'); return; }
                  const orderData = {
-                     customerName: document.getElementById('deliveryName').value,
+                    customerName: document.getElementById('deliveryName').value,
                      mobile: document.getElementById('deliveryMobile').value,
                      address: document.getElementById('deliveryAddress').value,
                      items: Object.values(cart).filter(item => item.quantity > 0),
                      total: parseFloat(document.getElementById('paymentTotal').textContent.replace('₹', '')),
                      paymentMethod: document.querySelector('input[name="paymentOption"]:checked').value,
                  };
-
-                 placeOrderButton.textContent = 'Placing Order...';
-                 placeOrderButton.disabled = true;
-
+                 placeOrderButton.textContent = 'Placing Order...'; placeOrderButton.disabled = true;
                  try {
-                     await saveOrderToDB(orderData);
-                     cart = {}; // Clear local cart
-                     await saveCartToDB({}); // Clear cart in DB
-                     calculateCart(); // Update footer
-                     renderProducts(products); // Re-render product quantities
-                     showToast('toastOrderSuccess', 'success');
-                     closeOrderModal();
-                 } catch (error) {
-                     showToast('toastOrderError', 'error');
-                 } finally {
-                     placeOrderButton.textContent = getTranslation('placeOrderButton');
-                     placeOrderButton.disabled = false;
-                 }
+                     const orderId = await saveOrderToDB(orderData);
+                     cart = {}; await saveCartToDB({}); calculateCart(); renderProducts(products);
+                     showToast('toastOrderSuccess', 'success'); closeOrderModal(); console.log("Order placed with ID:", orderId);
+                 } catch (error) { showToast('toastOrderError', 'error'); }
+                 finally { placeOrderButton.textContent = getTranslation('placeOrderButton'); placeOrderButton.disabled = false; }
              });
         }
 
@@ -1043,153 +881,193 @@
             const loadingIndicator = document.getElementById('loadingIndicator');
             const errorIndicator = document.getElementById('errorIndicator');
             const authStatusEl = document.getElementById('authStatus');
-            let authToggleButton = document.getElementById('authToggleButton'); // Use let for re-assignment
+            let authToggleButton = document.getElementById('authToggleButton');
+
+            // Set initial UI state
+            if (authStatusEl) authStatusEl.textContent = 'Status: Initializing...';
+            if (loadingIndicator) {
+                loadingIndicator.textContent = getTranslation('loadingProducts');
+                loadingIndicator.classList.remove('hidden');
+            }
+            if (errorIndicator) errorIndicator.classList.add('hidden');
 
             try {
                 if (!firebaseConfig || Object.keys(firebaseConfig).length === 0) {
                     throw new Error("Firebase configuration is missing or empty.");
                 }
 
-                app = initializeApp(firebaseConfig);
+                // Initialize Firebase - ENSURE ONLY ONCE
+                console.log("Initializing Firebase App...");
+                if (!window.firebaseAppInstance) { // Use a unique global flag
+                     window.firebaseAppInstance = initializeApp(firebaseConfig);
+                     console.log("Firebase App initialized.");
+                } else {
+                     console.log("Firebase App already initialized.");
+                }
+                app = window.firebaseAppInstance;
                 auth = getAuth(app);
                 db = getFirestore(app);
+                console.log("Firebase Auth, DB obtained.");
 
-                try { await enableIndexedDbPersistence(db); } catch (err) { /* Handle persistence errors */ }
 
-                // Setup listeners *after* elements are potentially available
+                // Enable offline persistence
+                try {
+                    await enableIndexedDbPersistence(db);
+                    console.log("Firestore offline persistence enabled.");
+                } catch (err) {
+                    console.warn("Firestore persistence warning:", err.code);
+                }
+
+                // Setup static event listeners now that DOM is ready
+                console.log("Setting up static event listeners...");
                 setupAuthListeners();
                 setupOrderListeners();
+                console.log("Static listeners attached.");
 
-                // Authentication Logic (Crucial Part)
+                // Setup Auth State Listener - THIS IS THE CORE LOGIC
+                console.log("Setting up Auth State Listener...");
                 onAuthStateChanged(auth, async (user) => {
                     authStateInitialized = true;
-                    authStatusEl.textContent = 'Status: Updating...'; // Initial state while checking
+                    if(authStatusEl) authStatusEl.textContent = 'Status: Updating Auth...';
 
-                    if (cartListenerUnsubscribe) { cartListenerUnsubscribe(); cartListenerUnsubscribe = null; }
+                    if (cartListenerUnsubscribe) {
+                        cartListenerUnsubscribe();
+                        cartListenerUnsubscribe = null;
+                        console.log("Detached previous cart listener.");
+                    }
 
+                    // --- User Signed In ---
                     if (user) {
                         userId = user.uid;
                         const isAnon = user.isAnonymous;
-                        console.log(`Auth state: Signed In. User ID: ${userId}, Anonymous: ${isAnon}`);
+                        console.log(`Auth state changed: Signed In. User ID: ${userId}, Anonymous: ${isAnon}`);
 
-                        authStatusEl.textContent = isAnon ? 'Status: Guest' : `Status: Signed In`;
-                        authToggleButton.textContent = getTranslation('signOut');
-                        authToggleButton.className = 'px-4 py-2 bg-red-500 text-white font-semibold rounded-lg shadow-md hover:bg-red-600 transition duration-150';
-
-                        // IMPORTANT: Re-attach Sign Out listener using a clone to avoid duplicate listeners
-                        const newBtn = authToggleButton.cloneNode(true);
-                        authToggleButton.parentNode.replaceChild(newBtn, authToggleButton);
-                        authToggleButton = newBtn; // Update reference
-                        authToggleButton.onclick = async () => { try { await signOut(auth); } catch (e) { console.error("Sign Out Error:", e); showToast('toastAuthError', 'error'); } };
-
-                        // Load/Initialize Products (Only if needed or first time for user)
-                         if (products.length === 0) { // Only load if not already loaded
-                            if (loadingIndicator) loadingIndicator.textContent = 'Fetching products...';
-                            try {
-                                products = await fetchWithRetry(() => initializeProducts(db, userId));
-                            } catch(error) { /* Handled in function */ }
-                         }
-
-                        // Load Cart for non-anonymous user
-                        if (!isAnon) {
-                            cart = await loadCartFromDB(userId);
-                            const cartDocRef = getCartDocRef(db, userId);
-                            cartListenerUnsubscribe = onSnapshot(cartDocRef, (docSnap) => {
-                                const updatedCart = docSnap.data()?.cart || {};
-                                if (JSON.stringify(cart) !== JSON.stringify(updatedCart)) {
-                                    cart = updatedCart;
-                                    calculateCart();
-                                    renderProducts(products); // Re-render quantities
-                                    console.log("Real-time cart update.");
-                                }
-                            }, (error) => { console.error("Cart snapshot error:", error); showToast('toastCartLoadError', 'error'); });
-                        } else {
-                            cart = {}; // Reset cart for new anonymous session
+                        // Update UI
+                        if(authStatusEl) authStatusEl.textContent = isAnon ? 'Status: Guest' : `Status: Signed In`;
+                        if(authToggleButton) {
+                            authToggleButton.textContent = getTranslation('signOut');
+                            authToggleButton.className = 'px-4 py-2 bg-red-500 text-white font-semibold rounded-lg shadow-md hover:bg-red-600 transition duration-150';
+                            // Re-attach Sign Out listener safely
+                            const newBtn = authToggleButton.cloneNode(true);
+                            authToggleButton.parentNode.replaceChild(newBtn, authToggleButton);
+                            authToggleButton = newBtn;
+                            authToggleButton.onclick = async () => { /* Sign Out logic */
+                                try { await signOut(auth); } catch (e) { console.error("Sign Out Error:", e); showToast('toastAuthError', 'error'); }
+                            };
                         }
 
-                    } else { // User is signed out
+                        // Load/Initialize Products
+                        if (loadingIndicator) loadingIndicator.textContent = 'Fetching products...';
+                        if (loadingIndicator) loadingIndicator.classList.remove('hidden');
+                        if (errorIndicator) errorIndicator.classList.add('hidden');
+                        try {
+                            // Fetch products *only* if the products array is empty
+                            // This prevents refetching on every auth state change (like anonymous -> signed in)
+                            if (products.length === 0) {
+                                products = await fetchWithRetry(() => initializeProducts(db, userId));
+                                console.log("Products fetched/initialized:", products.length);
+                            } else {
+                                console.log("Products already loaded, skipping refetch.");
+                            }
+                        } catch(error) {
+                            console.error("Failed to fetch/initialize products:", error);
+                            if(errorIndicator) {
+                                errorIndicator.textContent = `${getTranslation('toastProductLoadError')}: ${error.message}`;
+                                errorIndicator.classList.remove('hidden');
+                            }
+                            if(loadingIndicator) loadingIndicator.classList.add('hidden');
+                            products = [];
+                        }
+
+                        // Load Cart or start listener for non-anonymous user
+                        if (!isAnon) {
+                            try {
+                                cart = await loadCartFromDB(userId);
+                                console.log("Initial cart loaded for signed-in user:", Object.keys(cart).length);
+                                const cartDocRef = getCartDocRef(db, userId);
+                                cartListenerUnsubscribe = onSnapshot(cartDocRef, (docSnap) => {
+                                    const updatedCart = docSnap.exists() ? docSnap.data().cart || {} : {};
+                                    if (JSON.stringify(cart) !== JSON.stringify(updatedCart)) {
+                                        cart = updatedCart;
+                                        calculateCart();
+                                        renderProducts(products);
+                                        console.log("Real-time cart update received.");
+                                    }
+                                }, (error) => {
+                                    console.error("Cart snapshot error:", error);
+                                    showToast('toastCartLoadError', 'error');
+                                });
+                            } catch (cartLoadError) {
+                                console.error("Error setting up cart listener:", cartLoadError);
+                                showToast('toastCartLoadError', 'error');
+                                cart = {};
+                            }
+                        } else {
+                            cart = {}; // Reset for anonymous
+                            console.log("User is anonymous, cart reset.");
+                        }
+
+                    }
+                    // --- User Signed Out ---
+                    else {
                         userId = null;
                         cart = {};
                         products = defaultProducts; // Reset to default
-                        console.log("Auth state: Signed Out.");
+                        console.log("Auth state changed: Signed Out.");
 
-                        authStatusEl.textContent = 'Status: Guest';
-                        authToggleButton.textContent = getTranslation('signIn');
-                        authToggleButton.className = 'px-4 py-2 bg-[#38A169] text-white font-semibold rounded-lg shadow-md hover:bg-green-700 transition duration-150';
-
-                         // IMPORTANT: Re-attach Sign In listener using a clone
-                         const newBtn = authToggleButton.cloneNode(true);
-                         authToggleButton.parentNode.replaceChild(newBtn, authToggleButton);
-                         authToggleButton = newBtn; // Update reference
-                         authToggleButton.onclick = openAuthModal;
+                        // Update UI
+                        if(authStatusEl) authStatusEl.textContent = 'Status: Guest';
+                        if(authToggleButton) {
+                            authToggleButton.textContent = getTranslation('signIn');
+                            authToggleButton.className = 'px-4 py-2 bg-[#38A169] text-white font-semibold rounded-lg shadow-md hover:bg-green-700 transition duration-150';
+                             // Re-attach Sign In listener
+                            const newBtn = authToggleButton.cloneNode(true);
+                            authToggleButton.parentNode.replaceChild(newBtn, authToggleButton);
+                            authToggleButton = newBtn;
+                            authToggleButton.onclick = openAuthModal;
+                        }
 
                         // Attempt anonymous sign-in
                         try {
+                            console.log("Attempting anonymous sign-in after sign out...");
                             await signInAnonymously(auth);
                             console.log("Signed in anonymously after sign out.");
                         } catch (anonError) {
-                            console.error("Failed to sign in anonymously:", anonError);
-                            authStatusEl.textContent = 'Error: Auth Failed';
-                            showToast('toastAuthError', 'error'); // Show auth error
+                            console.error("Failed to sign in anonymously after sign out:", anonError);
+                            if(authStatusEl) authStatusEl.textContent = 'Error: Auth Failed';
+                            showToast('toastAuthError', 'error');
                         }
                     }
 
-                    // Render UI after auth state is confirmed
-                    renderProducts(products);
+                    // Always Render UI after Auth State Update
+                     if ((products && products.length > 0) || (errorIndicator && errorIndicator.classList.contains('hidden'))) {
+                         renderProducts(products);
+                     } else if (loadingIndicator && loadingIndicator.classList.contains('hidden') && errorIndicator && !errorIndicator.classList.contains('hidden')) {
+                         console.log("Skipping render due to product load error.");
+                     }
                     calculateCart();
-                    // Show default view
                     showView(document.querySelector('.view-content:not(.hidden)')?.id || 'products-view');
 
                 }); // End of onAuthStateChanged
 
-                // --- Initial Sign-In Attempt (if token exists) ---
-                if (initialAuthToken) {
-                    try {
-                        await signInWithCustomToken(auth, initialAuthToken);
-                        console.log("Signed in with custom token.");
-                    } catch (tokenError) {
-                        console.error("Custom token sign-in failed, attempting anonymous.", tokenError);
-                        try { await signInAnonymously(auth); } catch (e) { /* Handle final failure */ }
-                    }
-                } else if (!auth.currentUser) { // Only sign in anonymously if no user is already present
-                    try {
-                        await signInAnonymously(auth);
-                        console.log("Signed in anonymously on initial load.");
-                    } catch (anonError) {
-                         console.error("Initial anonymous sign-in failed:", anonError);
-                         authStatusEl.textContent = 'Error: Auth Failed';
-                         showToast('toastAuthError', 'error'); // Show critical auth error
-                         if (errorIndicator) errorIndicator.classList.remove('hidden');
-                         if (loadingIndicator) loadingIndicator.classList.add('hidden');
-                    }
-                } else {
-                     console.log("User already exists, skipping initial anonymous sign-in.");
-                     // Manually trigger updates if onAuthStateChanged hasn't fired yet
-                     if (!authStateInitialized) {
-                         // This case might happen if auth state is cached by browser persistence
-                         userId = auth.currentUser.uid;
-                         products = await fetchWithRetry(() => initializeProducts(db, userId));
-                         if (!auth.currentUser.isAnonymous) {
-                             cart = await loadCartFromDB(userId);
-                         }
-                         renderProducts(products);
-                         calculateCart();
-                         showView('products-view');
-                     }
-                }
+                // --- Initial Sign-In Attempt Logic ---
+                console.log("Checking initial auth state...");
+                // Let onAuthStateChanged handle the initial state.
 
                 // Setup session persistence
                 await setPersistence(auth, browserSessionPersistence);
+                console.log("Browser session persistence set.");
 
-
-            } catch (error) {
-                console.error("CRITICAL: Firebase initialization or initial sign-in failed.", error);
-                if (loadingIndicator) loadingIndicator.classList.add('hidden');
-                if (errorIndicator) {
-                     errorIndicator.textContent = `Error initializing application: ${error.message}`;
+            } catch (error) { // Catch errors from initializeApp, persistence
+                console.error("CRITICAL: Application initialization failed.", error);
+                if(loadingIndicator) loadingIndicator.classList.add('hidden');
+                if(errorIndicator) {
+                     errorIndicator.textContent = `${getTranslation('errorLoadingApp')}: ${error.message}`;
                      errorIndicator.classList.remove('hidden');
                 }
-                document.getElementById('authStatus').textContent = 'Error: Init Failed';
+                if(authStatusEl) authStatusEl.textContent = 'Error: Init Failed';
+                const proceedButton = document.getElementById('proceedToOrderButton');
+                if(proceedButton) proceedButton.disabled = true;
             }
         }
 
@@ -1197,6 +1075,7 @@
         document.addEventListener('DOMContentLoaded', initializeApp);
 
     </script>
+
 </body>
 </html>
 
